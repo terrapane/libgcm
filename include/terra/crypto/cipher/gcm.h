@@ -97,7 +97,7 @@ class GCM
             const std::span<const std::uint8_t> key,
             BlockCipher cipher = BlockCipher::AES);
         GCM(const GCM &other);
-        GCM(GCM &&other);
+        GCM(GCM &&other) noexcept;
         virtual ~GCM();
 
         GCM &operator=(const GCM &other);

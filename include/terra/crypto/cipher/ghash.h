@@ -42,7 +42,6 @@
 #include <cstdint>
 #include <terra/secutil/secure_array.h>
 #include <terra/secutil/secure_vector.h>
-#include "gcm.h"
 
 namespace Terra::Crypto::Cipher
 {

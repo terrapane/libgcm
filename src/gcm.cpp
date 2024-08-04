@@ -142,14 +142,14 @@ GCM::GCM(const GCM &other) :
  *  Comments:
  *      None.
  */
-GCM::GCM(GCM &&other) :
+GCM::GCM(GCM &&other) noexcept :
     finalized{other.finalized},
     final_text{other.final_text},
     counter{other.counter},
     aes{std::move(other.aes)},
-    H{std::move(other.H)},
-    Y0{std::move(other.Y0)},
-    Y{std::move(other.Y)},
+    H{other.H},
+    Y0{other.Y0},
+    Y{other.Y},
     ghash{std::move(other.ghash)}
 {
 }
@@ -253,7 +253,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
     ghash.reset();
 
     // Ensure the IV length is acceptable
-    if ((iv.size() < 1) || (iv.size() > Max_IV_Length))
+    if (iv.empty() || (iv.size() > Max_IV_Length))
     {
         throw GCMException("Invalid IV length given");
     }

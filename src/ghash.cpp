@@ -152,10 +152,13 @@ void GHASH::InputAAD(const std::span<const std::uint8_t> aad)
 
     // Update the AAD length
     if ((aad_length + aad.size() <= aad_length) ||
-        ((aad_length += aad.size()) > Max_AAD_Octets))
+        ((aad_length + aad.size()) > Max_AAD_Octets))
     {
         throw GCMException("Maximum AAD input length exceeded");
     }
+
+    // Update the AAD length
+    aad_length += aad.size();
 }
 
 /*
@@ -202,10 +205,13 @@ void GHASH::InputText(const std::span<const std::uint8_t> text)
 
     // Update input text length
     if ((text_length + text.size() <= text_length) ||
-        ((text_length += text.size()) > Max_Input_Octets))
+        ((text_length + text.size()) > Max_Input_Octets))
     {
         throw GCMException("Maximum text input length exceeded");
     }
+
+    // Update the text length
+    text_length += text.size();
 }
 
 /*
@@ -349,7 +355,8 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
     if (!remaining_input.empty())
     {
         consumed =
-            std::min(std::size_t(16) - remaining_input.size(), text.size());
+            std::min(static_cast<std::size_t>(16) - remaining_input.size(),
+                     text.size());
         remaining_input.insert(remaining_input.end(),
                                text.data(),
                                text.data() + consumed);
@@ -484,7 +491,7 @@ constexpr void MultiplySingleTerm(std::size_t index,
     constexpr std::uint32_t Divisor_R32 = 0xe100'0000;
 
     // If the target bit Y[i] is 1, X = X XOR T
-    if (Y[index] & bit) VectorXOR(X, T);
+    if ((Y[index] & bit) != 0) VectorXOR(X, T);
 
     // Bit 127 determines a shift or both shift and perform modulo division
     if ((T[3] & 0x0000'0001) == 0)
