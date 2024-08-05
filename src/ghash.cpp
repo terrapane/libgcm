@@ -109,6 +109,10 @@ GHASH::GHASH(const std::span<const std::uint8_t, 16> H,
  */
 GHASH::~GHASH()
 {
+    // For security reasons, zero all internal data that does not securely
+    // clear themselves
+    SecUtil::SecureErase(aad_complete);
+    SecUtil::SecureErase(finalized);
     SecUtil::SecureErase(aad_length);
     SecUtil::SecureErase(text_length);
 }

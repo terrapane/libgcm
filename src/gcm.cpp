@@ -171,7 +171,11 @@ GCM::GCM(GCM &&other) noexcept :
  */
 GCM::~GCM()
 {
+    // For security reasons, zero all internal data that does not securely
+    // clear themselves
     SecUtil::SecureErase(counter);
+    SecUtil::SecureErase(finalized);
+    SecUtil::SecureErase(final_text);
 }
 
 /*
