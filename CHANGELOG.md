@@ -1,5 +1,13 @@
 # Change Log
 
+v1.0.4
+
+- Updated libaes to support FreeBSD
+
+v1.0.3
+
+- Updated libaes dependency
+
 v1.0.2
 
 - Updated to used the latest Simple Test Framework (STF)
