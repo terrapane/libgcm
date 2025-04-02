@@ -1,5 +1,10 @@
 # Change Log
 
+v1.0.5
+
+- Updated to use latest libaes
+- Updated to latest security utilities library
+
 v1.0.4
 
 - Updated libaes to support FreeBSD
