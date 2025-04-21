@@ -1,5 +1,9 @@
 # Change Log
 
+v1.1.0
+
+- Updated to v1.1.0 of libaes
+
 v1.0.5
 
 - Updated to use latest libaes

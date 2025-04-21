@@ -37,7 +37,7 @@ FetchContent_Declare(bitutil
 # Fetch and make available the AES library
 FetchContent_Declare(libaes
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    GIT_TAG        v1.0.6
+    GIT_TAG        v1.1.0
     GIT_SHALLOW    true)
 
 # Make dependencies available
