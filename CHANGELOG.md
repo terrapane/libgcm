@@ -2,7 +2,7 @@
 
 v1.1.0
 
-- Updated to v1.1.0 of libaes
+- Updated library dependencies
 
 v1.0.5
 
