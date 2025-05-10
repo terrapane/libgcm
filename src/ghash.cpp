@@ -52,8 +52,9 @@ GHASH::GHASH(const std::span<const std::uint8_t, 16> H) :
     aad_length{0},
     text_length{0},
     H{},
-    Y{}
+    Yi{}
 {
+    remaining_input.reserve(16);
     GetWordArray(H, this->H);
 }
 
@@ -87,6 +88,7 @@ GHASH::GHASH(const std::span<const std::uint8_t, 16> H,
              const std::span<const std::uint8_t> text) :
     GHASH(H)
 {
+    remaining_input.reserve(16);
     InputAAD(aad);
     InputText(text);
     Finalize();
@@ -297,7 +299,7 @@ void GHASH::Result(std::span<std::uint8_t, 16> result)
     if (!finalized) throw GCMException("Hash is not finalized");
 
     // Copy the value of Y into result
-    PutWordArray(Y, result);
+    PutWordArray(Yi, result);
 }
 
 /*
@@ -322,7 +324,7 @@ void GHASH::Result(std::span<std::uint32_t, 4> result)
     if (!finalized) throw GCMException("Hash is not finalized");
 
     // Copy the value of Yi into result
-    std::memcpy(result.data(), Y.data(), result.size_bytes());
+    std::memcpy(result.data(), Yi.data(), result.size_bytes());
 }
 
 /*
@@ -368,7 +370,7 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
         // If there is only a partial block, just return
         if (remaining_input.size() < 16) return;
 
-        // Place the octets into the word array
+        // Place the octets into the array
         GetWordArray(std::span<const std::uint8_t, 16>(remaining_input.data(),
                                                        remaining_input.size()),
                      T);
@@ -376,11 +378,11 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
         // Determine the number of octets remaining as input
         remaining -= consumed;
 
-        // Yi XOR Ai
-        VectorXOR(Y, T);
+        // Yi XOR A_i (or C_i)
+        VectorXOR(Yi, T);
 
         // Multiply Yi x H
-        MultiplyGF(Y, H);
+        MultiplyGF(Yi, H);
 
         // Clear the remaining input buffer
         remaining_input.clear();
@@ -395,14 +397,14 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
                      T);
 
         // Yi+1 = Yi XOR A_i (or C_i)
-        VectorXOR(Y, T);
+        VectorXOR(Yi, T);
 
         // Adjust the count of remaining and consumed octets
         remaining -= 16;
         consumed += 16;
 
         // Multiply Yi+1 = Yi x H
-        MultiplyGF(Y, H);
+        MultiplyGF(Yi, H);
     }
 
     // If there are any residual octets, just store them
@@ -445,10 +447,10 @@ void GHASH::ProcessResidualInput()
                      T);
 
         // Yi+1 = Yi XOR A_i (or C_i)
-        VectorXOR(Y, T);
+        VectorXOR(Yi, T);
 
         // Multiply Yi+1 = Yi x H
-        MultiplyGF(Y, H);
+        MultiplyGF(Yi, H);
 
         // Clear the remaining_input
         remaining_input.clear();

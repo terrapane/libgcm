@@ -3,6 +3,9 @@
 v1.1.0
 
 - Updated library dependencies
+- Made compiler warning stricter
+- Addressed warnings produced by the compiler
+- Removed unused bitutil dependency
 
 v1.0.5
 

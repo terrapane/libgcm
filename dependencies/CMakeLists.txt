@@ -12,7 +12,7 @@ if(libgcm_BUILD_TESTS)
     # Fetch the Simple Test Framework library
     FetchContent_Declare(stf
         GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/stf.git
-        GIT_TAG        v1.0.1
+        GIT_TAG        v1.0.2
         GIT_SHALLOW    true)
 
     # It is not necessary to install the STF library
@@ -34,11 +34,9 @@ FetchContent_Declare(secutil
     GIT_TAG        v1.0.6
     GIT_SHALLOW    true)
 
-# Fetch and make available bit-oriented utility functions
-FetchContent_Declare(bitutil
-    GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/bitutil.git
-    GIT_TAG        v1.0.1
-    GIT_SHALLOW    true)
+# If not installing libgcm, turn off installation for dependencies
+set(libaes_INSTALL ${libgcm_INSTALL})
+set(secutil_INSTALL ${libgcm_INSTALL})
 
 # Make dependencies available
-FetchContent_MakeAvailable(libaes secutil bitutil)
+FetchContent_MakeAvailable(libaes secutil)

@@ -82,7 +82,7 @@ class GHASH
         SecUtil::SecureVector<std::uint8_t> remaining_input;
         SecUtil::SecureArray<std::uint32_t, 4> T;
         SecUtil::SecureArray<std::uint32_t, 4> H;
-        SecUtil::SecureArray<std::uint32_t, 4> Y;
+        SecUtil::SecureArray<std::uint32_t, 4> Yi;
 };
 
 } // namespace Terra::Crypto::Cipher
