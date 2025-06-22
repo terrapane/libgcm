@@ -1,5 +1,9 @@
 # Change Log
 
+v1.1.1
+
+- Updated to use latest libaes
+
 v1.1.0
 
 - Updated library dependencies

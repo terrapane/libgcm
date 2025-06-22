@@ -25,13 +25,13 @@ endif()
 # Fetch and make available the AES library
 FetchContent_Declare(libaes
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    GIT_TAG        v1.1.0
+    GIT_TAG        v1.1.1
     GIT_SHALLOW    true)
 
 # Fetch and make available security-related utility functions
 FetchContent_Declare(secutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        v1.0.6
+    GIT_TAG        v1.0.7
     GIT_SHALLOW    true)
 
 # If not installing libgcm, turn off installation for dependencies
