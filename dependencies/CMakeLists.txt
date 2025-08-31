@@ -12,7 +12,7 @@ if(libgcm_BUILD_TESTS)
     # Fetch the Simple Test Framework library
     FetchContent_Declare(stf
         GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/stf.git
-        GIT_TAG        v1.0.2
+        GIT_TAG        v1.0.3
         GIT_SHALLOW    true)
 
     # It is not necessary to install the STF library
@@ -25,13 +25,13 @@ endif()
 # Fetch and make available the AES library
 FetchContent_Declare(libaes
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    GIT_TAG        v1.1.1
+    GIT_TAG        v1.1.2
     GIT_SHALLOW    true)
 
 # Fetch and make available security-related utility functions
 FetchContent_Declare(secutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        v1.0.7
+    GIT_TAG        v1.0.8
     GIT_SHALLOW    true)
 
 # If not installing libgcm, turn off installation for dependencies

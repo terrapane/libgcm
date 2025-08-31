@@ -1,5 +1,10 @@
 # Change Log
 
+v1.1.2
+
+- Updated to use latest libaes
+- CMake changes to support downstream unit testing
+
 v1.1.1
 
 - Updated to use latest libaes

@@ -21,10 +21,10 @@ option(libgcm_INSTALL "Install the GCM Library" ON)
 # Determine whether clang-tidy will be performed
 option(libgcm_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 
+include(CTest)
+
 add_subdirectory(dependencies)
 add_subdirectory(src)
-
-include(CTest)
 
 if(BUILD_TESTING AND libgcm_BUILD_TESTS)
     add_subdirectory(test)
