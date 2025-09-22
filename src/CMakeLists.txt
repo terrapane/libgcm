@@ -1,3 +1,6 @@
+# Include standard installation directory variables
+include(GNUInstallDirs)
+
 # Create the library
 add_library(gcm STATIC gcm.cpp ghash.cpp)
 add_library(Terra::libgcm ALIAS gcm)
@@ -7,7 +10,8 @@ target_include_directories(gcm
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # Specify the C++ standard to observe
 set_target_properties(gcm
@@ -37,7 +41,6 @@ target_link_libraries(gcm PUBLIC Terra::secutil Terra::libaes)
 
 # Install target and associated include files
 if(libgcm_INSTALL)
-    include(GNUInstallDirs)
     install(TARGETS gcm EXPORT gcmTargets ARCHIVE)
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/ TYPE INCLUDE)
     install(EXPORT gcmTargets

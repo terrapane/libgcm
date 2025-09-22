@@ -1,5 +1,10 @@
 # Change Log
 
+v1.1.3
+
+- CMake changes
+- Updated dependencies
+
 v1.1.2
 
 - Updated to use latest libaes
