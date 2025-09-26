@@ -7,8 +7,6 @@ add_library(Terra::libgcm ALIAS gcm)
 
 # Make project include directory available to external projects
 target_include_directories(gcm
-    PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
