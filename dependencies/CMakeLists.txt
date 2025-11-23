@@ -25,7 +25,7 @@ endif()
 # Fetch and make available the AES library
 FetchContent_Declare(libaes
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/libaes.git
-    GIT_TAG        v1.1.3
+    GIT_TAG        v1.1.4
     GIT_SHALLOW    true)
 
 # Fetch and make available security-related utility functions
