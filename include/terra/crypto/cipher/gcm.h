@@ -62,7 +62,6 @@
 #include <span>
 #include <cstdint>
 #include <limits>
-#include <memory>
 #include <terra/secutil/secure_array.h>
 #include <terra/crypto/cipher/aes.h>
 #include "ghash.h"

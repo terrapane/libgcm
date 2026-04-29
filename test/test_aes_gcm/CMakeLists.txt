@@ -20,3 +20,8 @@ target_compile_options(test_aes_gcm
 # Ensure CTest can find the test
 add_test(NAME test_aes_gcm
          COMMAND test_aes_gcm)
+
+# If speed tests are enabled, pass that to the compiler
+if(libgcm_SPEED_TESTS)
+    target_compile_definitions(test_aes_gcm PRIVATE TERRA_ENABLE_GCM_SPEED_TESTS)
+endif()

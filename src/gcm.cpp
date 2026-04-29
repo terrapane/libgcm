@@ -21,7 +21,11 @@
  *      None.
  */
 
+#include <iostream>
 #include <cstring>
+#include <ranges>
+#include <algorithm>
+#include <cstddef>
 #include <terra/crypto/cipher/gcm.h>
 #include <terra/secutil/secure_erase.h>
 #include "gcm_utilities.h"
@@ -274,7 +278,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
     }
 
     // Set the value of H to zero
-    std::memset(H.data(), 0, H.size());
+    std::ranges::fill(H, 0);
 
     // Assign H to E(K, 0^128)
     aes.Encrypt(H, H);
@@ -283,9 +287,9 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
     if (iv.size() == 12)
     {
         // Y0 = IV || 0^31 || 1
-        std::memcpy(Y0.data(), iv.data(), iv.size());
+        std::ranges::copy(iv, Y0.begin());
         counter = 1;
-        PutWord(counter, std::span<std::uint8_t,4>(Y0.data() + 12, 4));
+        PutWord(counter, std::span(Y0).subspan(12).first<4>());
 
         // Copy Y0 to Y
         Y = Y0;
@@ -297,7 +301,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
         Y = Y0;
 
         // Read the initial counter value
-        GetWord(std::span<const std::uint8_t, 4>(Y.data() + 12, 4), counter);
+        GetWord(std::span(Y).subspan(12).first<4>(), counter);
     }
 
     // Reset some internal variables
@@ -391,19 +395,21 @@ std::span<std::uint8_t> GCM::Encrypt(
         throw GCMException("Ciphertext span is too short");
     }
 
-    // How many octets remaining
-    std::size_t remaining = plaintext.size();
-    if (remaining == 0) return {ciphertext.data(), 0};
+    // If the plaintext is empty, return an empty ciphertext span
+    if (plaintext.empty()) return {ciphertext.data(), 0};
 
-    // Pointers into the ciphertext and plaintext spans
-    const std::uint8_t *p = plaintext.data();
-    std::uint8_t *c = ciphertext.data();
+    // Define a span containing an integral number of blocks
+    auto blocks =
+        plaintext.first(plaintext.size() & ~static_cast<std::size_t>(15));
+
+    // Define an iterator over the ciphertext
+    auto c = ciphertext.begin();
 
     // Iterate over blocks of 16 octets at a time
-    while (remaining >= 16)
+    for (auto p = blocks.begin(); p != blocks.end(); p += 16, c += 16)
     {
         // Increment Yi modulo 2^32
-        PutWord(++counter, std::span<std::uint8_t, 4>(Y.data() + 12, 4));
+        PutWord(++counter, std::span(Y).subspan(12).first<4>());
 
         // Encrypt / E(K, Yi)
         aes.Encrypt(Y, T1);
@@ -416,33 +422,31 @@ std::span<std::uint8_t> GCM::Encrypt(
 
         // Input the ciphertext into the GHASH object
         ghash->InputText(std::span<std::uint8_t, 16>(c, 16));
-
-        // Increment / decrement values
-        remaining -= 16;
-        p += 16;
-        c += 16;
     }
 
+    // Create a span over the remaining partial block (if any)
+    auto remaining = plaintext.subspan(blocks.size());
+
     // Is there a partial block?
-    if (remaining > 0)
+    if (!remaining.empty())
     {
         // Increment right-most 32-bits of Yi modulo 2^32
-        PutWord(++counter, std::span<std::uint8_t, 4>(Y.data() + 12, 4));
+        PutWord(++counter, std::span(Y).subspan(12).first<4>());
 
         // Encrypt / E(K, Yi)
         aes.Encrypt(Y, T1);
 
         // Ci = Pi XOR E(K, Yi)
-        std::memset(T2.data(), 0, T2.size());
-        std::memcpy(T2.data(), p, remaining);
+        std::ranges::fill(T2, 0);
+        std::ranges::copy(remaining, T2.begin());
         GetWordArray(T1, W1);
         GetWordArray(T2, W2);
         VectorXOR(W1, W2);
         PutWordArray(W1, T2);
-        std::memcpy(c, T2.data(), remaining);
+        std::ranges::copy(std::span(T2).first(remaining.size()), c);
 
         // Input the ciphertext into the GHASH object
-        ghash->InputText(std::span<std::uint8_t>(c, remaining));
+        ghash->InputText(std::span(c, remaining.size()));
 
         // Having a partial block indicates the final text
         final_text = true;
@@ -503,19 +507,21 @@ std::span<std::uint8_t> GCM::Decrypt(
         throw GCMException("Plaintext span is too short");
     }
 
-    // How many octets remaining
-    std::size_t remaining = ciphertext.size();
-    if (remaining == 0) return {plaintext.data(), 0};
+    // If the plaintext is empty, return an empty ciphertext span
+    if (ciphertext.empty()) return {plaintext.data(), 0};
 
-    // Pointers into the ciphertext and plaintext spans
-    const std::uint8_t *c = ciphertext.data();
-    std::uint8_t *p = plaintext.data();
+    // Define a span containing an integral number of blocks
+    auto blocks =
+        ciphertext.first(ciphertext.size() & ~static_cast<std::size_t>(15));
+
+    // Define an iterator over the plaintext
+    auto p = plaintext.begin();
 
     // Iterate over blocks of 16 octets at a time
-    while (remaining >= 16)
+    for (auto c = blocks.begin(); c != blocks.end(); c += 16, p += 16)
     {
         // Increment Yi modulo 2^32
-        PutWord(++counter, std::span<std::uint8_t, 4>(Y.data() + 12, 4));
+        PutWord(++counter, std::span(Y).subspan(12).first<4>());
 
         // Encrypt / E(K, Yi)
         aes.Encrypt(Y, T1);
@@ -528,33 +534,31 @@ std::span<std::uint8_t> GCM::Decrypt(
 
         // Input the ciphertext into the GHASH object
         ghash->InputText(std::span<const std::uint8_t, 16>(c, 16));
-
-        // Increment / decrement values
-        remaining -= 16;
-        p += 16;
-        c += 16;
     }
 
+    // Create a span over the remaining partial block (if any)
+    auto remaining = ciphertext.subspan(blocks.size());
+
     // Is there a partial block?
-    if (remaining > 0)
+    if (!remaining.empty())
     {
         // Increment right-most 32-bits of Yi modulo 2^32
-        PutWord(++counter, std::span<std::uint8_t, 4>(Y.data() + 12, 4));
+        PutWord(++counter, std::span(Y).subspan(12).first<4>());
 
         // Encrypt / E(K, Yi)
         aes.Encrypt(Y, T1);
 
         // Pi = Ci XOR E(K, Yi)
-        std::memset(T2.data(), 0, T2.size());
-        std::memcpy(T2.data(), c, remaining);
+        std::ranges::fill(T2, 0);
+        std::ranges::copy(remaining, T2.begin());
         GetWordArray(T1, W1);
         GetWordArray(T2, W2);
         VectorXOR(W1, W2);
         PutWordArray(W1, T2);
-        std::memcpy(p, T2.data(), remaining);
+        std::ranges::copy(std::span(T2).first(remaining.size()), p);
 
-        // Input the ciphertext into the GHASH object
-        ghash->InputText(std::span<const std::uint8_t>(c, remaining));
+        // Input the remaining ciphertext into the GHASH object
+        ghash->InputText(remaining);
 
         // Having a partial block indicates the final text
         final_text = true;
@@ -652,7 +656,7 @@ bool GCM::FinalizeAndVerifyTag(const std::span<const std::uint8_t> tag)
     }
 
     // Compare the octets of tag against T2 (the resulting tag)
-    if (std::memcmp(T1.data(), tag.data(), tag.size()) != 0) return false;
+    if (!std::ranges::equal(std::span(T1).first(tag.size()), tag)) return false;
 
     return true;
 }

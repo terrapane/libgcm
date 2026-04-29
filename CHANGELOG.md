@@ -1,5 +1,11 @@
 # Change Log
 
+v1.1.5
+
+- Updated dependencies
+- Move MultiplySingleTerm() into an anonymous namespace
+- Switched from pointers to iterators
+
 v1.1.4
 
 - Updated dependencies

@@ -324,7 +324,7 @@ void GHASH::Result(std::span<std::uint32_t, 4> result)
     if (!finalized) throw GCMException("Hash is not finalized");
 
     // Copy the value of Yi into result
-    std::memcpy(result.data(), Yi.data(), result.size_bytes());
+    std::ranges::copy(result, Yi.begin());
 }
 
 /*
@@ -337,7 +337,7 @@ void GHASH::Result(std::span<std::uint32_t, 4> result)
  *      and multiplication operations on the input.
  *
  *  Parameters:
- *      input [in]
+ *      text [in]
  *          Input to be consumed by the hashing function.
  *
  *  Returns:
@@ -364,8 +364,8 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
             std::min(static_cast<std::size_t>(16) - remaining_input.size(),
                      text.size());
         remaining_input.insert(remaining_input.end(),
-                               text.data(),
-                               text.data() + consumed);
+                               text.first(consumed).begin(),
+                               text.first(consumed).end());
 
         // If there is only a partial block, just return
         if (remaining_input.size() < 16) return;
@@ -442,9 +442,7 @@ void GHASH::ProcessResidualInput()
         remaining_input.resize(16, 0);
 
         // Place the octets into the word array
-        GetWordArray(std::span<const std::uint8_t, 16>(remaining_input.data(),
-                                                       16),
-                     T);
+        GetWordArray(std::span(remaining_input).first<16>(), T);
 
         // Yi+1 = Yi XOR A_i (or C_i)
         VectorXOR(Yi, T);
@@ -456,6 +454,9 @@ void GHASH::ProcessResidualInput()
         remaining_input.clear();
     }
 }
+
+namespace
+{
 
 /*
  *  GHASH::MultiplySingleTerm()
@@ -515,6 +516,8 @@ constexpr void MultiplySingleTerm(std::size_t index,
     }
 }
 
+} // namespace
+
 /*
  *  GHASH::MultiplyGF()
  *
@@ -542,10 +545,10 @@ void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X,
                        std::span<const std::uint32_t, 4> Y)
 {
     // Copy the value of X into T
-    std::memcpy(T.data(), X.data(), X.size_bytes());
+    std::ranges::copy(X, T.begin());
 
     // Zero X
-    std::memset(X.data(), 0, X.size_bytes());
+    std::ranges::fill(X, 0);
 
     // Operator over each term
     MultiplySingleTerm(0, 0x8000'0000, T, X, Y);

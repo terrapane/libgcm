@@ -1855,3 +1855,85 @@ STF_TEST(AES_GCM, TestGCMMove)
     gcm_move.FinalizeAndGetTag(tag);
     STF_ASSERT_EQ(expected_tag, tag);
 }
+
+#ifdef TERRA_ENABLE_GCM_SPEED_TESTS
+
+// This function tests the performance of the encryption code
+STF_TEST(AES_GCM, EncryptionSpeedTest128)
+{
+    const std::array<std::uint8_t, 16> key =
+    {
+        0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+        0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08
+    };
+    const std::array<std::uint8_t, 12> iv =
+    {
+        0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+        0xde, 0xca, 0xf8, 0x88
+    };
+    std::array<std::uint8_t, 16> plaintext =
+    {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+    };
+    const std::array<std::uint8_t, 16> expected_tag =
+    {
+        0x5e, 0xfd, 0xd9, 0xf6, 0x0e, 0xbc, 0x01, 0xb2,
+        0xa7, 0x18, 0x1f, 0x36, 0xef, 0x18, 0xa1, 0x7b
+    };
+    std::array<std::uint8_t, 16> tag;
+
+    GCM gcm(iv, key);
+
+    // Encrypt in place repeatedly
+    for (std::uint64_t i = 0; i < 200'000'000; i++)
+    {
+        gcm.Encrypt(plaintext, plaintext);
+    }
+
+    // Retrieve the authentication tag
+    gcm.FinalizeAndGetTag(tag);
+
+    STF_ASSERT_EQ(expected_tag, tag);
+}
+
+// This function tests the performance of the encryption code
+STF_TEST(AES_GCM, DecryptionSpeedTest128)
+{
+    const std::array<std::uint8_t, 16> key =
+    {
+        0xfe, 0xff, 0xe9, 0x92, 0x86, 0x65, 0x73, 0x1c,
+        0x6d, 0x6a, 0x8f, 0x94, 0x67, 0x30, 0x83, 0x08
+    };
+    const std::array<std::uint8_t, 12> iv =
+    {
+        0xca, 0xfe, 0xba, 0xbe, 0xfa, 0xce, 0xdb, 0xad,
+        0xde, 0xca, 0xf8, 0x88
+    };
+    std::array<std::uint8_t, 16> ciphertext =
+    {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+        0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+    };
+    const std::array<std::uint8_t, 16> expected_tag =
+    {
+        0x5e, 0xfd, 0xd9, 0xf6, 0x0e, 0xbc, 0x01, 0xb2,
+        0xa7, 0x18, 0x1f, 0x36, 0xef, 0x18, 0xa1, 0x7b
+    };
+    std::array<std::uint8_t, 16> tag;
+
+    GCM gcm(iv, key);
+
+    // Decrypt in place repeatedly
+    for (std::uint64_t i = 0; i < 200'000'000; i++)
+    {
+        gcm.Encrypt(ciphertext, ciphertext);
+    }
+
+    // Retrieve the authentication tag
+    gcm.FinalizeAndGetTag(tag);
+
+    STF_ASSERT_EQ(expected_tag, tag);
+}
+
+#endif // TERRA_ENABLE_GCM_SPEED_TESTS
