@@ -21,7 +21,6 @@
  *      None.
  */
 
-#include <iostream>
 #include <cstring>
 #include <ranges>
 #include <algorithm>
