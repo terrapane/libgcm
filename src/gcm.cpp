@@ -277,7 +277,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
     }
 
     // Set the value of H to zero
-    std::ranges::fill(H, 0);
+    H = {};
 
     // Assign H to E(K, 0^128)
     aes.Encrypt(H, H);
@@ -436,7 +436,7 @@ std::span<std::uint8_t> GCM::Encrypt(
         aes.Encrypt(Y, T1);
 
         // Ci = Pi XOR E(K, Yi)
-        std::ranges::fill(T2, 0);
+        T2 = {};
         std::ranges::copy(remaining, T2.begin());
         GetWordArray(T1, W1);
         GetWordArray(T2, W2);
@@ -548,7 +548,7 @@ std::span<std::uint8_t> GCM::Decrypt(
         aes.Encrypt(Y, T1);
 
         // Pi = Ci XOR E(K, Yi)
-        std::ranges::fill(T2, 0);
+        T2 = {};
         std::ranges::copy(remaining, T2.begin());
         GetWordArray(T1, W1);
         GetWordArray(T2, W2);

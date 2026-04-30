@@ -546,7 +546,7 @@ void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X,
     std::ranges::copy(X, T.begin());
 
     // Zero X
-    std::ranges::fill(X, 0);
+    std::ranges::fill(X, static_cast<std::uint32_t>(0));
 
     // Operator over each term
     MultiplySingleTerm(0, 0x8000'0000, T, X, Y);
