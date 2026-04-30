@@ -392,9 +392,7 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
     while (remaining >= 16)
     {
         // Place the octets into the word array
-        GetWordArray(std::span<const std::uint8_t, 16>(text.data() + consumed,
-                                                       16),
-                     T);
+        GetWordArray(text.subspan(consumed, 16).first<16>(), T);
 
         // Yi+1 = Yi XOR A_i (or C_i)
         VectorXOR(Yi, T);
@@ -411,8 +409,8 @@ void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
     if (remaining > 0)
     {
         remaining_input.insert(remaining_input.end(),
-                               text.data() + consumed,
-                               text.data() + consumed + remaining);
+                               text.subspan(consumed, remaining).begin(),
+                               text.subspan(consumed, remaining).end());
     }
 }
 
