@@ -4,6 +4,7 @@ v1.1.5
 
 - Updated dependencies
 - Move MultiplySingleTerm() into an anonymous namespace
+- Addressed a number of clang-tidy nits
 - Switched from pointers to iterators
 
 v1.1.4

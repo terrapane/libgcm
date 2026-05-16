@@ -43,7 +43,7 @@
 #include <terra/secutil/secure_array.h>
 #include <terra/secutil/secure_vector.h>
 
-namespace Terra::Crypto::Cipher
+namespace Terra::Crypto::Cipher::GCM
 {
 
 // Define the GHASH object
@@ -51,26 +51,33 @@ class GHASH
 {
     public:
         // Maximum length of AAD (2^64 - 1 bits) in octets
-        static constexpr std::uint64_t Max_AAD_Octets = 0x1fff'ffff'ffff'ffff;
+        static constexpr std::uint64_t Max_AAD_Octets =
+                                                    0x1fff'ffff'ffff'ffffULL;
 
         // Maximum length of the plaintext or ciphertext (2^39 - 256 bits)
         // expressed in terms of octets
-        static constexpr std::size_t Max_Input_Octets = 0x0000'000f'ffff'ffe0;
+        static constexpr std::size_t Max_Input_Octets =
+                                                    0x0000'000f'ffff'ffe0ULL;
 
-        GHASH(const std::span<const std::uint8_t, 16> H);
-        GHASH(const std::span<const std::uint8_t, 16> H,
-              const std::span<const std::uint8_t> aad,
-              const std::span<const std::uint8_t> text);
+        explicit GHASH(std::span<const std::uint8_t, 16> H);
+        GHASH(std::span<const std::uint8_t, 16> H,
+              std::span<const std::uint8_t> aad,
+              std::span<const std::uint8_t> text);
+        GHASH(const GHASH &other) = default;
+        GHASH(GHASH &&other) = default;
         ~GHASH();
 
-        void InputAAD(const std::span<const std::uint8_t> aad);
-        void InputText(const std::span<const std::uint8_t> text);
+        GHASH &operator=(const GHASH &) = default;
+        GHASH &operator=(GHASH &&) = default;
+
+        void InputAAD(std::span<const std::uint8_t> aad);
+        void InputText(std::span<const std::uint8_t> text);
         void Finalize();
         void Result(std::span<std::uint8_t, 16> result);
         void Result(std::span<std::uint32_t, 4> result);
 
     protected:
-        void ConsumeInput(const std::span<const std::uint8_t> text);
+        void ConsumeInput(std::span<const std::uint8_t> text);
         void ProcessResidualInput();
         void MultiplyGF(std::span<std::uint32_t, 4> X,
                         std::span<const std::uint32_t, 4> Y);
@@ -85,4 +92,4 @@ class GHASH
         SecUtil::SecureArray<std::uint32_t, 4> Yi;
 };
 
-} // namespace Terra::Crypto::Cipher
+} // namespace Terra::Crypto::Cipher::GCM

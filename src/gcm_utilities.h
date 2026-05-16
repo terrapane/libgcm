@@ -1,7 +1,7 @@
 /*
  *  gcm_utilities.h
  *
- *  Copyright (C) 2024
+ *  Copyright (C) 2024, 2026
  *  Terrapane Corporation
  *  All Rights Reserved
  *
@@ -19,7 +19,7 @@
 #include <span>
 #include <cstdint>
 
-namespace Terra::Crypto::Cipher
+namespace Terra::Crypto::Cipher::GCM
 {
 
 /*
@@ -43,7 +43,7 @@ namespace Terra::Crypto::Cipher
  *      None.
  */
 constexpr void VectorXOR(std::span<std::uint32_t, 4> X,
-                         const std::span<const std::uint32_t, 4> Y)
+                         std::span<const std::uint32_t, 4> Y)
 {
     X[0] ^= Y[0];
     X[1] ^= Y[1];
@@ -69,10 +69,10 @@ constexpr void VectorXOR(std::span<std::uint32_t, 4> X,
  */
 constexpr void VectorRightShift(std::span<std::uint32_t, 4> X)
 {
-    X[3] = (X[3] >> 1) | ((X[2] << 31) & 0x80000000);
-    X[2] = (X[2] >> 1) | ((X[1] << 31) & 0x80000000);
-    X[1] = (X[1] >> 1) | ((X[0] << 31) & 0x80000000);
-    X[0] = (X[0] >> 1);
+    X[3] = (X[3] >> 1U) | ((X[2] << 31U) & 0x80000000UL);
+    X[2] = (X[2] >> 1U) | ((X[1] << 31U) & 0x80000000UL);
+    X[1] = (X[1] >> 1U) | ((X[0] << 31U) & 0x80000000UL);
+    X[0] = (X[0] >> 1U);
 }
 
 /*
@@ -96,25 +96,25 @@ constexpr void VectorRightShift(std::span<std::uint32_t, 4> X)
  *  Comments:
  *      None.
  */
-constexpr void GetWordArray(const std::span<const std::uint8_t, 16> octets,
+constexpr void GetWordArray(std::span<const std::uint8_t, 16> octets,
                             std::span<std::uint32_t, 4> words)
 {
-    words[0] = ((static_cast<std::uint32_t>(octets[ 0]) << 24)) |
-               ((static_cast<std::uint32_t>(octets[ 1]) << 16)) |
-               ((static_cast<std::uint32_t>(octets[ 2]) <<  8)) |
-               ((static_cast<std::uint32_t>(octets[ 3])      ));
-    words[1] = ((static_cast<std::uint32_t>(octets[ 4]) << 24)) |
-               ((static_cast<std::uint32_t>(octets[ 5]) << 16)) |
-               ((static_cast<std::uint32_t>(octets[ 6]) <<  8)) |
-               ((static_cast<std::uint32_t>(octets[ 7])      ));
-    words[2] = ((static_cast<std::uint32_t>(octets[ 8]) << 24)) |
-               ((static_cast<std::uint32_t>(octets[ 9]) << 16)) |
-               ((static_cast<std::uint32_t>(octets[10]) <<  8)) |
-               ((static_cast<std::uint32_t>(octets[11])      ));
-    words[3] = ((static_cast<std::uint32_t>(octets[12]) << 24)) |
-               ((static_cast<std::uint32_t>(octets[13]) << 16)) |
-               ((static_cast<std::uint32_t>(octets[14]) <<  8)) |
-               ((static_cast<std::uint32_t>(octets[15])      ));
+    words[0] = ((static_cast<std::uint32_t>(octets[ 0]) << 24U)) |
+               ((static_cast<std::uint32_t>(octets[ 1]) << 16U)) |
+               ((static_cast<std::uint32_t>(octets[ 2]) <<  8U)) |
+               ((static_cast<std::uint32_t>(octets[ 3])       ));
+    words[1] = ((static_cast<std::uint32_t>(octets[ 4]) << 24U)) |
+               ((static_cast<std::uint32_t>(octets[ 5]) << 16U)) |
+               ((static_cast<std::uint32_t>(octets[ 6]) <<  8U)) |
+               ((static_cast<std::uint32_t>(octets[ 7])       ));
+    words[2] = ((static_cast<std::uint32_t>(octets[ 8]) << 24U)) |
+               ((static_cast<std::uint32_t>(octets[ 9]) << 16U)) |
+               ((static_cast<std::uint32_t>(octets[10]) <<  8U)) |
+               ((static_cast<std::uint32_t>(octets[11])       ));
+    words[3] = ((static_cast<std::uint32_t>(octets[12]) << 24U)) |
+               ((static_cast<std::uint32_t>(octets[13]) << 16U)) |
+               ((static_cast<std::uint32_t>(octets[14]) <<  8U)) |
+               ((static_cast<std::uint32_t>(octets[15])       ));
 }
 
 /*
@@ -137,13 +137,13 @@ constexpr void GetWordArray(const std::span<const std::uint8_t, 16> octets,
  *  Comments:
  *      None.
  */
-constexpr void GetWord(const std::span<const std::uint8_t, 4> octets,
+constexpr void GetWord(std::span<const std::uint8_t, 4> octets,
                        std::uint32_t &word)
 {
-    word = ((static_cast<std::uint32_t>(octets[ 0]) << 24)) |
-           ((static_cast<std::uint32_t>(octets[ 1]) << 16)) |
-           ((static_cast<std::uint32_t>(octets[ 2]) <<  8)) |
-           ((static_cast<std::uint32_t>(octets[ 3])      ));
+    word = ((static_cast<std::uint32_t>(octets[ 0]) << 24U)) |
+           ((static_cast<std::uint32_t>(octets[ 1]) << 16U)) |
+           ((static_cast<std::uint32_t>(octets[ 2]) <<  8U)) |
+           ((static_cast<std::uint32_t>(octets[ 3])       ));
 }
 
 /*
@@ -166,25 +166,25 @@ constexpr void GetWord(const std::span<const std::uint8_t, 4> octets,
  *  Comments:
  *      None.
  */
-constexpr void PutWordArray(const std::span<const std::uint32_t, 4> words,
+constexpr void PutWordArray(std::span<const std::uint32_t, 4> words,
                             std::span<std::uint8_t, 16> octets)
 {
-    octets[ 0] = (words[0] >> 24) & 0xff;
-    octets[ 1] = (words[0] >> 16) & 0xff;
-    octets[ 2] = (words[0] >>  8) & 0xff;
-    octets[ 3] = (words[0]      ) & 0xff;
-    octets[ 4] = (words[1] >> 24) & 0xff;
-    octets[ 5] = (words[1] >> 16) & 0xff;
-    octets[ 6] = (words[1] >>  8) & 0xff;
-    octets[ 7] = (words[1]      ) & 0xff;
-    octets[ 8] = (words[2] >> 24) & 0xff;
-    octets[ 9] = (words[2] >> 16) & 0xff;
-    octets[10] = (words[2] >>  8) & 0xff;
-    octets[11] = (words[2]      ) & 0xff;
-    octets[12] = (words[3] >> 24) & 0xff;
-    octets[13] = (words[3] >> 16) & 0xff;
-    octets[14] = (words[3] >>  8) & 0xff;
-    octets[15] = (words[3]      ) & 0xff;
+    octets[ 0] = (words[0] >> 24U) & 0xffU;
+    octets[ 1] = (words[0] >> 16U) & 0xffU;
+    octets[ 2] = (words[0] >>  8U) & 0xffU;
+    octets[ 3] = (words[0]       ) & 0xffU;
+    octets[ 4] = (words[1] >> 24U) & 0xffU;
+    octets[ 5] = (words[1] >> 16U) & 0xffU;
+    octets[ 6] = (words[1] >>  8U) & 0xffU;
+    octets[ 7] = (words[1]       ) & 0xffU;
+    octets[ 8] = (words[2] >> 24U) & 0xffU;
+    octets[ 9] = (words[2] >> 16U) & 0xffU;
+    octets[10] = (words[2] >>  8U) & 0xffU;
+    octets[11] = (words[2]       ) & 0xffU;
+    octets[12] = (words[3] >> 24U) & 0xffU;
+    octets[13] = (words[3] >> 16U) & 0xffU;
+    octets[14] = (words[3] >>  8U) & 0xffU;
+    octets[15] = (words[3]       ) & 0xffU;
 }
 
 /*
@@ -209,10 +209,10 @@ constexpr void PutWordArray(const std::span<const std::uint32_t, 4> words,
 constexpr void PutWord(const std::uint32_t word,
                        std::span<std::uint8_t, 4> octets)
 {
-    octets[0] = (word >> 24) & 0xff;
-    octets[1] = (word >> 16) & 0xff;
-    octets[2] = (word >>  8) & 0xff;
-    octets[3] = (word      ) & 0xff;
+    octets[0] = (word >> 24U) & 0xffU;
+    octets[1] = (word >> 16U) & 0xffU;
+    octets[2] = (word >>  8U) & 0xffU;
+    octets[3] = (word       ) & 0xffU;
 }
 
-} // namespace Terra::Crypto::Cipher
+} // namespace Terra::Crypto::Cipher::GCM

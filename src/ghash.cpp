@@ -22,12 +22,16 @@
  */
 
 #include <cstring>
+#include <cstddef>
+#include <cstdint>
+#include <span>
+#include <algorithm>
 #include <terra/crypto/cipher/gcm.h>
 #include <terra/crypto/cipher/ghash.h>
 #include <terra/secutil/secure_erase.h>
 #include "gcm_utilities.h"
 
-namespace Terra::Crypto::Cipher
+namespace Terra::Crypto::Cipher::GCM
 {
 
 /*
@@ -46,11 +50,12 @@ namespace Terra::Crypto::Cipher
  *  Comments:
  *      None.
  */
-GHASH::GHASH(const std::span<const std::uint8_t, 16> H) :
+GHASH::GHASH(std::span<const std::uint8_t, 16> H) :
     aad_complete{false},
     finalized{false},
     aad_length{0},
     text_length{0},
+    T{},
     H{},
     Yi{}
 {
@@ -83,9 +88,9 @@ GHASH::GHASH(const std::span<const std::uint8_t, 16> H) :
  *  Comments:
  *      None.
  */
-GHASH::GHASH(const std::span<const std::uint8_t, 16> H,
-             const std::span<const std::uint8_t> aad,
-             const std::span<const std::uint8_t> text) :
+GHASH::GHASH(std::span<const std::uint8_t, 16> H,
+             std::span<const std::uint8_t> aad,
+             std::span<const std::uint8_t> text) :
     GHASH(H)
 {
     remaining_input.reserve(16);
@@ -142,7 +147,7 @@ GHASH::~GHASH()
  *  Comments:
  *      The maximum length of AAD per the specification is 2^64 - 1 bits.
  */
-void GHASH::InputAAD(const std::span<const std::uint8_t> aad)
+void GHASH::InputAAD(std::span<const std::uint8_t> aad)
 {
     // Was it believed that AAD input was complete?
     if (aad_complete) throw GCMException("AAD received out-of-order");
@@ -188,7 +193,7 @@ void GHASH::InputAAD(const std::span<const std::uint8_t> aad)
  *  Comments:
  *      The maximum text length per the specification is 2^39 - 256 bits.
  */
-void GHASH::InputText(const std::span<const std::uint8_t> text)
+void GHASH::InputText(std::span<const std::uint8_t> text)
 {
     // Was the hashing operation already finalized?
     if (finalized) throw GCMException("Hash already finalized");
@@ -248,30 +253,30 @@ void GHASH::Finalize()
     finalized = true;
 
     // Final operation uses the AAD and text lengths as bit lengths
-    aad_length <<= 3;
-    text_length <<= 3;
+    aad_length <<= 3U;
+    text_length <<= 3U;
 
     // Re-use remaining_input as a temporary buffer
     remaining_input.resize(16);
 
     // Place the AAD length into the buffer
-    remaining_input[ 0] = (aad_length >> 56) & 0xff;
-    remaining_input[ 1] = (aad_length >> 48) & 0xff;
-    remaining_input[ 2] = (aad_length >> 40) & 0xff;
-    remaining_input[ 3] = (aad_length >> 32) & 0xff;
-    remaining_input[ 4] = (aad_length >> 24) & 0xff;
-    remaining_input[ 5] = (aad_length >> 16) & 0xff;
-    remaining_input[ 6] = (aad_length >>  8) & 0xff;
-    remaining_input[ 7] = (aad_length      ) & 0xff;
+    remaining_input[ 0] = (aad_length >> 56U) & 0xffU;
+    remaining_input[ 1] = (aad_length >> 48U) & 0xffU;
+    remaining_input[ 2] = (aad_length >> 40U) & 0xffU;
+    remaining_input[ 3] = (aad_length >> 32U) & 0xffU;
+    remaining_input[ 4] = (aad_length >> 24U) & 0xffU;
+    remaining_input[ 5] = (aad_length >> 16U) & 0xffU;
+    remaining_input[ 6] = (aad_length >>  8U) & 0xffU;
+    remaining_input[ 7] = (aad_length       ) & 0xffU;
 
-    remaining_input[ 8] = (text_length >> 56) & 0xff;
-    remaining_input[ 9] = (text_length >> 48) & 0xff;
-    remaining_input[10] = (text_length >> 40) & 0xff;
-    remaining_input[11] = (text_length >> 32) & 0xff;
-    remaining_input[12] = (text_length >> 24) & 0xff;
-    remaining_input[13] = (text_length >> 16) & 0xff;
-    remaining_input[14] = (text_length >>  8) & 0xff;
-    remaining_input[15] = (text_length      ) & 0xff;
+    remaining_input[ 8] = (text_length >> 56U) & 0xffU;
+    remaining_input[ 9] = (text_length >> 48U) & 0xffU;
+    remaining_input[10] = (text_length >> 40U) & 0xffU;
+    remaining_input[11] = (text_length >> 32U) & 0xffU;
+    remaining_input[12] = (text_length >> 24U) & 0xffU;
+    remaining_input[13] = (text_length >> 16U) & 0xffU;
+    remaining_input[14] = (text_length >>  8U) & 0xffU;
+    remaining_input[15] = (text_length       ) & 0xffU;
 
     // Process the remaining_input vector
     ProcessResidualInput();
@@ -346,7 +351,7 @@ void GHASH::Result(std::span<std::uint32_t, 4> result)
  *  Comments:
  *      None.
  */
-void GHASH::ConsumeInput(const std::span<const std::uint8_t> text)
+void GHASH::ConsumeInput(std::span<const std::uint8_t> text)
 {
     // How many octets remaining
     std::size_t remaining = text.size();
@@ -499,7 +504,7 @@ constexpr void MultiplySingleTerm(std::size_t index,
     if ((Y[index] & bit) != 0) VectorXOR(X, T);
 
     // Bit 127 determines a shift or both shift and perform modulo division
-    if ((T[3] & 0x0000'0001) == 0)
+    if ((T[3] & 0x0000'0001U) == 0)
     {
         // Right-shift vector T
         VectorRightShift(T);
@@ -524,7 +529,7 @@ constexpr void MultiplySingleTerm(std::size_t index,
  *      Galois Field GF(2^128).  That is, implements X = X * Y.
  *
  *  Parameters:
- *      X [in]
+ *      X [in/out]
  *          First input value used in a multiplication operation.
  *
  *      Y [in]
@@ -682,4 +687,4 @@ void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X,
     MultiplySingleTerm(3, 0x0000'0001, T, X, Y);
 }
 
-} // namespace Terra::Crypto::Cipher
+} // namespace Terra::Crypto::Cipher::GCM

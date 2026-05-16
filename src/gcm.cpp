@@ -21,15 +21,19 @@
  *      None.
  */
 
-#include <cstring>
-#include <ranges>
-#include <algorithm>
 #include <cstddef>
+#include <span>
+#include <cstdint>
+#include <utility>
+#include <memory>
+#include <algorithm>
 #include <terra/crypto/cipher/gcm.h>
+#include <terra/crypto/cipher/ghash.h>
 #include <terra/secutil/secure_erase.h>
+#include <terra/crypto/cipher/aes.h>
 #include "gcm_utilities.h"
 
-namespace Terra::Crypto::Cipher
+namespace Terra::Crypto::Cipher::GCM
 {
 
 /*
@@ -52,7 +56,14 @@ namespace Terra::Crypto::Cipher
 GCM::GCM(BlockCipher cipher) :
     finalized{false},
     final_text{false},
-    counter{0}
+    counter{0},
+    H{},
+    Y0{},
+    Y{},
+    T1{},
+    T2{},
+    W1{},
+    W2{}
 {
     if (cipher != BlockCipher::AES)
     {
@@ -84,8 +95,8 @@ GCM::GCM(BlockCipher cipher) :
  *  Comments:
  *      None.
  */
-GCM::GCM(const std::span<const std::uint8_t> iv,
-         const std::span<const std::uint8_t> key,
+GCM::GCM(std::span<const std::uint8_t> iv,
+         std::span<const std::uint8_t> key,
          BlockCipher cipher) :
     GCM(cipher)
 {
@@ -116,7 +127,11 @@ GCM::GCM(const GCM &other) :
     aes{other.aes},
     H{other.H},
     Y0{other.Y0},
-    Y{other.Y}
+    Y{other.Y},
+    T1{},
+    T2{},
+    W1{},
+    W2{}
 {
     // Does the other object have a GHASH object?
     if (other.ghash)
@@ -150,9 +165,13 @@ GCM::GCM(GCM &&other) noexcept :
     final_text{other.final_text},
     counter{other.counter},
     aes{std::move(other.aes)},
-    H{other.H},
-    Y0{other.Y0},
-    Y{other.Y},
+    H{std::move(other.H)},
+    Y0{std::move(other.Y0)},
+    Y{std::move(other.Y)},
+    T1{},
+    T2{},
+    W1{},
+    W2{},
     ghash{std::move(other.ghash)}
 {
 }
@@ -185,7 +204,7 @@ GCM::~GCM()
  *  GCM::operator=()
  *
  *  Description:
- *      Assignment operator for the GCM object.
+ *      Copy assignment operator for the GCM object.
  *
  *  Parameters:
  *      other [in]
@@ -253,8 +272,8 @@ GCM &GCM::operator=(const GCM &other)
  *  Comments:
  *      None.
  */
-void GCM::SetKey(const std::span<const std::uint8_t> iv,
-                 const std::span<const std::uint8_t> key)
+void GCM::SetKey(std::span<const std::uint8_t> iv,
+                 std::span<const std::uint8_t> key)
 {
     // Reset the GHASH object, if one exists
     ghash.reset();
@@ -270,7 +289,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
         // Set the encryption key
         aes.SetKey(key);
     }
-    catch(const AESException &e)
+    catch(const AES::AESException &e)
     {
         // Translate the GCM exception
         throw GCMException(e.what());
@@ -333,7 +352,7 @@ void GCM::SetKey(const std::span<const std::uint8_t> iv,
  *  Comments:
  *      The maximum length of AAD per the specification is 2^64 - 1 bits.
  */
-void GCM::InputAAD(const std::span<const std::uint8_t> aad)
+void GCM::InputAAD(std::span<const std::uint8_t> aad)
 {
     // Ensure that the GCM object is properly keyed
     if (!ghash) throw GCMException("A key was not provided to GCM");
@@ -376,7 +395,7 @@ void GCM::InputAAD(const std::span<const std::uint8_t> aad)
  *      object unless the object is reset via a call to the SetKey() function.
  */
 std::span<std::uint8_t> GCM::Encrypt(
-    const std::span<const std::uint8_t> plaintext,
+    std::span<const std::uint8_t> plaintext,
     std::span<std::uint8_t> ciphertext)
 {
     // Ensure that the GCM object is properly keyed
@@ -488,7 +507,7 @@ std::span<std::uint8_t> GCM::Encrypt(
  *      object unless the object is reset via a call to the SetKey() function.
  */
 std::span<std::uint8_t> GCM::Decrypt(
-    const std::span<const std::uint8_t> ciphertext,
+    std::span<const std::uint8_t> ciphertext,
     std::span<std::uint8_t> plaintext)
 {
     // Ensure that the GCM object is properly keyed
@@ -643,7 +662,7 @@ void GCM::FinalizeAndGetTag(std::span<std::uint8_t, 16> tag)
  *  Comments:
  *      Calling this function more than once will result in an exception.
  */
-bool GCM::FinalizeAndVerifyTag(const std::span<const std::uint8_t> tag)
+bool GCM::FinalizeAndVerifyTag(std::span<const std::uint8_t> tag)
 {
     // Finalize the GCM object and put the tag into T1
     FinalizeAndGetTag(T1);
@@ -660,4 +679,4 @@ bool GCM::FinalizeAndVerifyTag(const std::span<const std::uint8_t> tag)
     return true;
 }
 
-} // namespace Terra::Crypto::Cipher
+} // namespace Terra::Crypto::Cipher::GCM

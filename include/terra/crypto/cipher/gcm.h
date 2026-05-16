@@ -66,7 +66,7 @@
 #include <terra/crypto/cipher/aes.h>
 #include "ghash.h"
 
-namespace Terra::Crypto::Cipher
+namespace Terra::Crypto::Cipher::GCM
 {
 
 // Define an exception class for GCM-related exceptions
@@ -76,7 +76,7 @@ class GCMException : public std::runtime_error
 };
 
 // Define the cipher types that can be used with GCM (only AES is supported)
-enum class BlockCipher
+enum class BlockCipher : std::uint8_t
 {
     AES
 };
@@ -86,43 +86,44 @@ class GCM
 {
     public:
         // The maximum length of the IV (2^64 - 1 bits) in octets
-        static constexpr std::uint64_t Max_IV_Length = 0x1fff'ffff'ffff'ffff;
+        static constexpr std::uint64_t Max_IV_Length = 0x1fff'ffff'ffff'ffffULL;
 
         // Maximum number of 128-bit blocks that may be encrypted / decrypted
-        static constexpr std::size_t Max_Input_Blocks = 0xffff'fffe;
+        static constexpr std::size_t Max_Input_Blocks = 0xffff'fffeULL;
 
-        GCM(BlockCipher cipher = BlockCipher::AES);
-        GCM(const std::span<const std::uint8_t> iv,
-            const std::span<const std::uint8_t> key,
+        explicit GCM(BlockCipher cipher = BlockCipher::AES);
+        GCM(std::span<const std::uint8_t> iv,
+            std::span<const std::uint8_t> key,
             BlockCipher cipher = BlockCipher::AES);
         GCM(const GCM &other);
         GCM(GCM &&other) noexcept;
         virtual ~GCM();
 
         GCM &operator=(const GCM &other);
+        GCM &operator=(GCM &&other) = default;
 
-        void SetKey(const std::span<const std::uint8_t> iv,
-                    const std::span<const std::uint8_t> key);
+        void SetKey(std::span<const std::uint8_t> iv,
+                    std::span<const std::uint8_t> key);
 
-        void InputAAD(const std::span<const std::uint8_t> aad);
+        void InputAAD(std::span<const std::uint8_t> aad);
 
         std::span<std::uint8_t> Encrypt(
-            const std::span<const std::uint8_t> plaintext,
+            std::span<const std::uint8_t> plaintext,
             std::span<std::uint8_t> ciphertext);
 
         std::span<std::uint8_t> Decrypt(
-            const std::span<const std::uint8_t> ciphertext,
+            std::span<const std::uint8_t> ciphertext,
             std::span<std::uint8_t> plaintext);
 
         void FinalizeAndGetTag(std::span<std::uint8_t, 16> tag);
 
-        bool FinalizeAndVerifyTag(const std::span<const std::uint8_t> tag);
+        bool FinalizeAndVerifyTag(std::span<const std::uint8_t> tag);
 
     protected:
         bool finalized;
         bool final_text;
         std::uint32_t counter;
-        AES aes;
+        AES::AES aes;
         SecUtil::SecureArray<std::uint8_t, 16> H;
         SecUtil::SecureArray<std::uint8_t, 16> Y0;
         SecUtil::SecureArray<std::uint8_t, 16> Y;
@@ -133,4 +134,4 @@ class GCM
         std::unique_ptr<GHASH> ghash;
 };
 
-} // namespace Terra::Crypto::Cipher
+} // namespace Terra::Crypto::Cipher::GCM
