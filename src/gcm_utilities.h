@@ -69,9 +69,9 @@ constexpr void VectorXOR(std::span<std::uint32_t, 4> X,
  */
 constexpr void VectorRightShift(std::span<std::uint32_t, 4> X)
 {
-    X[3] = (X[3] >> 1U) | ((X[2] << 31U) & 0x80000000UL);
-    X[2] = (X[2] >> 1U) | ((X[1] << 31U) & 0x80000000UL);
-    X[1] = (X[1] >> 1U) | ((X[0] << 31U) & 0x80000000UL);
+    X[3] = (X[3] >> 1U) | (X[2] << 31U);
+    X[2] = (X[2] >> 1U) | (X[1] << 31U);
+    X[1] = (X[1] >> 1U) | (X[0] << 31U);
     X[0] = (X[0] >> 1U);
 }
 
@@ -99,22 +99,22 @@ constexpr void VectorRightShift(std::span<std::uint32_t, 4> X)
 constexpr void GetWordArray(std::span<const std::uint8_t, 16> octets,
                             std::span<std::uint32_t, 4> words)
 {
-    words[0] = ((static_cast<std::uint32_t>(octets[ 0]) << 24U)) |
-               ((static_cast<std::uint32_t>(octets[ 1]) << 16U)) |
-               ((static_cast<std::uint32_t>(octets[ 2]) <<  8U)) |
-               ((static_cast<std::uint32_t>(octets[ 3])       ));
-    words[1] = ((static_cast<std::uint32_t>(octets[ 4]) << 24U)) |
-               ((static_cast<std::uint32_t>(octets[ 5]) << 16U)) |
-               ((static_cast<std::uint32_t>(octets[ 6]) <<  8U)) |
-               ((static_cast<std::uint32_t>(octets[ 7])       ));
-    words[2] = ((static_cast<std::uint32_t>(octets[ 8]) << 24U)) |
-               ((static_cast<std::uint32_t>(octets[ 9]) << 16U)) |
-               ((static_cast<std::uint32_t>(octets[10]) <<  8U)) |
-               ((static_cast<std::uint32_t>(octets[11])       ));
-    words[3] = ((static_cast<std::uint32_t>(octets[12]) << 24U)) |
-               ((static_cast<std::uint32_t>(octets[13]) << 16U)) |
-               ((static_cast<std::uint32_t>(octets[14]) <<  8U)) |
-               ((static_cast<std::uint32_t>(octets[15])       ));
+    words[0] = (static_cast<std::uint32_t>(octets[ 0]) << 24U) |
+               (static_cast<std::uint32_t>(octets[ 1]) << 16U) |
+               (static_cast<std::uint32_t>(octets[ 2]) <<  8U) |
+               (static_cast<std::uint32_t>(octets[ 3])       );
+    words[1] = (static_cast<std::uint32_t>(octets[ 4]) << 24U) |
+               (static_cast<std::uint32_t>(octets[ 5]) << 16U) |
+               (static_cast<std::uint32_t>(octets[ 6]) <<  8U) |
+               (static_cast<std::uint32_t>(octets[ 7])       );
+    words[2] = (static_cast<std::uint32_t>(octets[ 8]) << 24U) |
+               (static_cast<std::uint32_t>(octets[ 9]) << 16U) |
+               (static_cast<std::uint32_t>(octets[10]) <<  8U) |
+               (static_cast<std::uint32_t>(octets[11])       );
+    words[3] = (static_cast<std::uint32_t>(octets[12]) << 24U) |
+               (static_cast<std::uint32_t>(octets[13]) << 16U) |
+               (static_cast<std::uint32_t>(octets[14]) <<  8U) |
+               (static_cast<std::uint32_t>(octets[15])       );
 }
 
 /*
@@ -140,10 +140,10 @@ constexpr void GetWordArray(std::span<const std::uint8_t, 16> octets,
 constexpr void GetWord(std::span<const std::uint8_t, 4> octets,
                        std::uint32_t &word)
 {
-    word = ((static_cast<std::uint32_t>(octets[ 0]) << 24U)) |
-           ((static_cast<std::uint32_t>(octets[ 1]) << 16U)) |
-           ((static_cast<std::uint32_t>(octets[ 2]) <<  8U)) |
-           ((static_cast<std::uint32_t>(octets[ 3])       ));
+    word = (static_cast<std::uint32_t>(octets[ 0]) << 24U) |
+           (static_cast<std::uint32_t>(octets[ 1]) << 16U) |
+           (static_cast<std::uint32_t>(octets[ 2]) <<  8U) |
+           (static_cast<std::uint32_t>(octets[ 3])       );
 }
 
 /*
@@ -169,22 +169,22 @@ constexpr void GetWord(std::span<const std::uint8_t, 4> octets,
 constexpr void PutWordArray(std::span<const std::uint32_t, 4> words,
                             std::span<std::uint8_t, 16> octets)
 {
-    octets[ 0] = (words[0] >> 24U) & 0xffU;
-    octets[ 1] = (words[0] >> 16U) & 0xffU;
-    octets[ 2] = (words[0] >>  8U) & 0xffU;
-    octets[ 3] = (words[0]       ) & 0xffU;
-    octets[ 4] = (words[1] >> 24U) & 0xffU;
-    octets[ 5] = (words[1] >> 16U) & 0xffU;
-    octets[ 6] = (words[1] >>  8U) & 0xffU;
-    octets[ 7] = (words[1]       ) & 0xffU;
-    octets[ 8] = (words[2] >> 24U) & 0xffU;
-    octets[ 9] = (words[2] >> 16U) & 0xffU;
-    octets[10] = (words[2] >>  8U) & 0xffU;
-    octets[11] = (words[2]       ) & 0xffU;
-    octets[12] = (words[3] >> 24U) & 0xffU;
-    octets[13] = (words[3] >> 16U) & 0xffU;
-    octets[14] = (words[3] >>  8U) & 0xffU;
-    octets[15] = (words[3]       ) & 0xffU;
+    octets[ 0] = static_cast<std::uint8_t>(words[0] >> 24U);
+    octets[ 1] = static_cast<std::uint8_t>(words[0] >> 16U);
+    octets[ 2] = static_cast<std::uint8_t>(words[0] >>  8U);
+    octets[ 3] = static_cast<std::uint8_t>(words[0]       );
+    octets[ 4] = static_cast<std::uint8_t>(words[1] >> 24U);
+    octets[ 5] = static_cast<std::uint8_t>(words[1] >> 16U);
+    octets[ 6] = static_cast<std::uint8_t>(words[1] >>  8U);
+    octets[ 7] = static_cast<std::uint8_t>(words[1]       );
+    octets[ 8] = static_cast<std::uint8_t>(words[2] >> 24U);
+    octets[ 9] = static_cast<std::uint8_t>(words[2] >> 16U);
+    octets[10] = static_cast<std::uint8_t>(words[2] >>  8U);
+    octets[11] = static_cast<std::uint8_t>(words[2]       );
+    octets[12] = static_cast<std::uint8_t>(words[3] >> 24U);
+    octets[13] = static_cast<std::uint8_t>(words[3] >> 16U);
+    octets[14] = static_cast<std::uint8_t>(words[3] >>  8U);
+    octets[15] = static_cast<std::uint8_t>(words[3]       );
 }
 
 /*
@@ -209,10 +209,10 @@ constexpr void PutWordArray(std::span<const std::uint32_t, 4> words,
 constexpr void PutWord(const std::uint32_t word,
                        std::span<std::uint8_t, 4> octets)
 {
-    octets[0] = (word >> 24U) & 0xffU;
-    octets[1] = (word >> 16U) & 0xffU;
-    octets[2] = (word >>  8U) & 0xffU;
-    octets[3] = (word       ) & 0xffU;
+    octets[0] = static_cast<std::uint8_t>(word >> 24U);
+    octets[1] = static_cast<std::uint8_t>(word >> 16U);
+    octets[2] = static_cast<std::uint8_t>(word >>  8U);
+    octets[3] = static_cast<std::uint8_t>(word       );
 }
 
 } // namespace Terra::Crypto::Cipher::GCM

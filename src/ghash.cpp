@@ -260,23 +260,23 @@ void GHASH::Finalize()
     remaining_input.resize(16);
 
     // Place the AAD length into the buffer
-    remaining_input[ 0] = (aad_length >> 56U) & 0xffU;
-    remaining_input[ 1] = (aad_length >> 48U) & 0xffU;
-    remaining_input[ 2] = (aad_length >> 40U) & 0xffU;
-    remaining_input[ 3] = (aad_length >> 32U) & 0xffU;
-    remaining_input[ 4] = (aad_length >> 24U) & 0xffU;
-    remaining_input[ 5] = (aad_length >> 16U) & 0xffU;
-    remaining_input[ 6] = (aad_length >>  8U) & 0xffU;
-    remaining_input[ 7] = (aad_length       ) & 0xffU;
+    remaining_input[ 0] = static_cast<std::uint8_t>(aad_length >> 56U);
+    remaining_input[ 1] = static_cast<std::uint8_t>(aad_length >> 48U);
+    remaining_input[ 2] = static_cast<std::uint8_t>(aad_length >> 40U);
+    remaining_input[ 3] = static_cast<std::uint8_t>(aad_length >> 32U);
+    remaining_input[ 4] = static_cast<std::uint8_t>(aad_length >> 24U);
+    remaining_input[ 5] = static_cast<std::uint8_t>(aad_length >> 16U);
+    remaining_input[ 6] = static_cast<std::uint8_t>(aad_length >>  8U);
+    remaining_input[ 7] = static_cast<std::uint8_t>(aad_length       );
 
-    remaining_input[ 8] = (text_length >> 56U) & 0xffU;
-    remaining_input[ 9] = (text_length >> 48U) & 0xffU;
-    remaining_input[10] = (text_length >> 40U) & 0xffU;
-    remaining_input[11] = (text_length >> 32U) & 0xffU;
-    remaining_input[12] = (text_length >> 24U) & 0xffU;
-    remaining_input[13] = (text_length >> 16U) & 0xffU;
-    remaining_input[14] = (text_length >>  8U) & 0xffU;
-    remaining_input[15] = (text_length       ) & 0xffU;
+    remaining_input[ 8] = static_cast<std::uint8_t>(text_length >> 56U);
+    remaining_input[ 9] = static_cast<std::uint8_t>(text_length >> 48U);
+    remaining_input[10] = static_cast<std::uint8_t>(text_length >> 40U);
+    remaining_input[11] = static_cast<std::uint8_t>(text_length >> 32U);
+    remaining_input[12] = static_cast<std::uint8_t>(text_length >> 24U);
+    remaining_input[13] = static_cast<std::uint8_t>(text_length >> 16U);
+    remaining_input[14] = static_cast<std::uint8_t>(text_length >>  8U);
+    remaining_input[15] = static_cast<std::uint8_t>(text_length       );
 
     // Process the remaining_input vector
     ProcessResidualInput();
