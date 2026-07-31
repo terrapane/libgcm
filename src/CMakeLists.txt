@@ -38,6 +38,11 @@ target_compile_options(gcm
 # Link against library dependencies
 target_link_libraries(gcm PUBLIC Terra::secutil Terra::libaes)
 
+# Specify whether to disable use of pre-computed GHASH tables
+if(libgcm_GHASH_DISABLE_TABLES)
+    target_compile_definitions(gcm PRIVATE TERRA_DISABLE_GHASH_TABLES)
+endif()
+
 # Install target and associated include files
 if(libgcm_INSTALL)
     install(TARGETS gcm EXPORT gcmTargets ARCHIVE)

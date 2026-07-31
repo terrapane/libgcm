@@ -76,6 +76,30 @@ constexpr void VectorRightShift(std::span<std::uint32_t, 4> X)
 }
 
 /*
+ *  VectorRightShiftOctet()
+ *
+ *  Description:
+ *      Shift the given vector one octet to the right.
+ *
+ *  Parameters:
+ *      X [in/out]
+ *          Vector that should be shifted to the right by one octet.
+ *
+ *  Returns:
+ *      Nothing, though the parameter X will updated.
+ *
+ *  Comments:
+ *      None.
+ */
+constexpr void VectorRightShiftOctet(std::span<std::uint32_t, 4> X)
+{
+    X[3] = (X[3] >> 8U) | (X[2] << 24U);
+    X[2] = (X[2] >> 8U) | (X[1] << 24U);
+    X[1] = (X[1] >> 8U) | (X[0] << 24U);
+    X[0] = (X[0] >> 8U);
+}
+
+/*
  *  GetWordArray()
  *
  *  Description:

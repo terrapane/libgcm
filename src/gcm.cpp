@@ -44,6 +44,16 @@ namespace Terra::Crypto::Cipher::GCM
  *      The default block cipher is AES.
  *
  *  Parameters:
+ *      use_tables [in]
+ *          Indicate whether tables should be computed and used.  Use of
+ *          tables will improve performance when data to be encrypted
+ *          increases in size.  To determine that crossover point, it's best
+ *          to perform tests with and without tables, but the crossover
+ *          point is generally just a couple of hundred octets.  Messages
+ *          larger than that will generally benefit from using tables, thus
+ *          the default for this parameter is set to true.  If your use of
+ *          GHASH is for small messages, you may prefer to set this to false.
+ *
  *      cipher [in]
  *          The block cipher to utilize.
  *
@@ -53,7 +63,8 @@ namespace Terra::Crypto::Cipher::GCM
  *  Comments:
  *      None.
  */
-GCM::GCM(BlockCipher cipher) :
+GCM::GCM(bool use_tables, BlockCipher cipher) :
+    use_tables{use_tables},
     finalized{false},
     final_text{false},
     counter{0},
@@ -86,6 +97,16 @@ GCM::GCM(BlockCipher cipher) :
  *          The encryption key to use with this this object.  This must be
  *          any one of 16, 24, or 32 octets for AES.
  *
+ *      use_tables [in]
+ *          Indicate whether tables should be computed and used.  Use of
+ *          tables will improve performance when data to be encrypted
+ *          increases in size.  To determine that crossover point, it's best
+ *          to perform tests with and without tables, but the crossover
+ *          point is generally just a couple of hundred octets.  Messages
+ *          larger than that will generally benefit from using tables, thus
+ *          the default for this parameter is set to true.  If your use of
+ *          GHASH is for small messages, you may prefer to set this to false.
+ *
  *      cipher [in]
  *          The block cipher to utilize.  The default is AES.
  *
@@ -97,8 +118,9 @@ GCM::GCM(BlockCipher cipher) :
  */
 GCM::GCM(std::span<const std::uint8_t> iv,
          std::span<const std::uint8_t> key,
+         bool use_tables,
          BlockCipher cipher) :
-    GCM(cipher)
+    GCM(use_tables, cipher)
 {
     // Set the encryption/decryption IV and key
     SetKey(iv, key);
@@ -121,6 +143,7 @@ GCM::GCM(std::span<const std::uint8_t> iv,
  *      None.
  */
 GCM::GCM(const GCM &other) :
+    use_tables{other.use_tables},
     finalized{other.finalized},
     final_text{other.final_text},
     counter{other.counter},
@@ -137,7 +160,7 @@ GCM::GCM(const GCM &other) :
     if (other.ghash)
     {
         // Create GHASH object
-        ghash = std::make_unique<GHASH>(H);
+        ghash = std::make_unique<GHASH>(H, use_tables);
 
         // Copy the GHASH object
         *ghash = *other.ghash;
@@ -161,6 +184,7 @@ GCM::GCM(const GCM &other) :
  *      None.
  */
 GCM::GCM(GCM &&other) noexcept :
+    use_tables{other.use_tables},
     finalized{other.finalized},
     final_text{other.final_text},
     counter{other.counter},
@@ -195,6 +219,7 @@ GCM::~GCM()
 {
     // For security reasons, zero all internal data that does not securely
     // clear themselves
+    SecUtil::SecureErase(use_tables);
     SecUtil::SecureErase(counter);
     SecUtil::SecureErase(finalized);
     SecUtil::SecureErase(final_text);
@@ -222,6 +247,7 @@ GCM &GCM::operator=(const GCM &other)
     if (this == &other) return *this;
 
     // Copy important values from the other objects (ignoring temporaries)
+    use_tables = other.use_tables;
     finalized = other.finalized;
     final_text = other.final_text;
     counter = other.counter;
@@ -237,7 +263,7 @@ GCM &GCM::operator=(const GCM &other)
     if (other.ghash)
     {
         // Create GHASH object
-        ghash = std::make_unique<GHASH>(H);
+        ghash = std::make_unique<GHASH>(H, use_tables);
 
         // Copy the GHASH object
         *ghash = *other.ghash;
@@ -314,8 +340,9 @@ void GCM::SetKey(std::span<const std::uint8_t> iv,
     }
     else
     {
-        // Compute the GHASH using (H, {}, iv) as input
-        GHASH(H, {}, iv).Result(Y0);
+        // Compute the GHASH and get the result; don't use tables since
+        // table generation would just slow this down
+        GHASH(H, {}, iv, false).Result(Y0);
         Y = Y0;
 
         // Read the initial counter value
@@ -327,7 +354,7 @@ void GCM::SetKey(std::span<const std::uint8_t> iv,
     final_text = false;
 
     // Create GHASH object
-    ghash = std::make_unique<GHASH>(H);
+    ghash = std::make_unique<GHASH>(H, use_tables);
 }
 
 /*
@@ -376,7 +403,7 @@ void GCM::InputAAD(std::span<const std::uint8_t> aad)
  *      plaintext [in]
  *          The octets to be encrypted.  This must contain one or more complete
  *          blocks (16 octets) with the exception that the final block may
- *          container fewer than 16 octets.  If a partial block (i.e., fewer
+ *          contain fewer than 16 octets.  If a partial block (i.e., fewer
  *          than 16 octets) is observed, it is assumed to be the final block
  *          and no other input is accepted.
  *
@@ -488,7 +515,7 @@ std::span<std::uint8_t> GCM::Encrypt(
  *      ciphertext [in]
  *          The octets to be decrypted.  This must contain one or more complete
  *          blocks (16 octets) with the exception that the final block may
- *          container fewer than 16 octets.  If a partial block (i.e., fewer
+ *          contain fewer than 16 octets.  If a partial block (i.e., fewer
  *          than 16 octets) is observed, it is assumed to be the final block
  *          and no other input is accepted.
  *

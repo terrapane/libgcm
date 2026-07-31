@@ -24,6 +24,9 @@ option(libgcm_CLANG_TIDY "Use clang-tidy to perform linting during build" OFF)
 # Option to enable speed test code
 option(libgcm_SPEED_TESTS "Enable GCM Speed Test" OFF)
 
+# Option to disable use of precomputed tables in GHASH (useful if limited on space)
+option(libgcm_GHASH_DISABLE_TABLES "Disable use or tables in GHASH" OFF)
+
 include(CTest)
 
 add_subdirectory(dependencies)

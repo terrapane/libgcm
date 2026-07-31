@@ -40,6 +40,7 @@
 
 #include <span>
 #include <cstdint>
+#include <array>
 #include <terra/secutil/secure_array.h>
 #include <terra/secutil/secure_vector.h>
 
@@ -59,10 +60,12 @@ class GHASH
         static constexpr std::size_t Max_Input_Octets =
                                                     0x0000'000f'ffff'ffe0ULL;
 
-        explicit GHASH(std::span<const std::uint8_t, 16> H);
+        explicit GHASH(std::span<const std::uint8_t, 16> H,
+                       bool use_tables);
         GHASH(std::span<const std::uint8_t, 16> H,
               std::span<const std::uint8_t> aad,
-              std::span<const std::uint8_t> text);
+              std::span<const std::uint8_t> text,
+              bool use_tables);
         GHASH(const GHASH &other) = default;
         GHASH(GHASH &&other) = default;
         ~GHASH();
@@ -81,7 +84,11 @@ class GHASH
         void ProcessResidualInput();
         void MultiplyGF(std::span<std::uint32_t, 4> X,
                         std::span<const std::uint32_t, 4> Y);
+#ifndef TERRA_DISABLE_GHASH_TABLES
+        void MultiplyGFUsingTables(std::span<std::uint32_t, 4> X);
+#endif
 
+        bool use_tables;
         bool aad_complete;
         bool finalized;
         std::uint64_t aad_length;
@@ -90,6 +97,12 @@ class GHASH
         SecUtil::SecureArray<std::uint32_t, 4> T;
         SecUtil::SecureArray<std::uint32_t, 4> H;
         SecUtil::SecureArray<std::uint32_t, 4> Yi;
+
+#ifndef TERRA_DISABLE_GHASH_TABLES
+        // The size of the following table is 64K and improves performance
+        std::array<std::array<SecUtil::SecureArray<std::uint32_t, 4>, 256>, 16>
+            M;
+#endif
 };
 
 } // namespace Terra::Crypto::Cipher::GCM

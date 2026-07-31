@@ -91,9 +91,11 @@ class GCM
         // Maximum number of 128-bit blocks that may be encrypted / decrypted
         static constexpr std::size_t Max_Input_Blocks = 0xffff'fffeULL;
 
-        explicit GCM(BlockCipher cipher = BlockCipher::AES);
+        explicit GCM(bool use_tables = true,
+                     BlockCipher cipher = BlockCipher::AES);
         GCM(std::span<const std::uint8_t> iv,
             std::span<const std::uint8_t> key,
+            bool use_tables = true,
             BlockCipher cipher = BlockCipher::AES);
         GCM(const GCM &other);
         GCM(GCM &&other) noexcept;
@@ -120,6 +122,7 @@ class GCM
         bool FinalizeAndVerifyTag(std::span<const std::uint8_t> tag);
 
     protected:
+        bool use_tables;
         bool finalized;
         bool final_text;
         std::uint32_t counter;
