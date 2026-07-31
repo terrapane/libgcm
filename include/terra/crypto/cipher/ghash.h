@@ -40,7 +40,9 @@
 
 #include <span>
 #include <cstdint>
+#ifndef TERRA_DISABLE_GHASH_TABLES
 #include <array>
+#endif // TERRA_DISABLE_GHASH_TABLES
 #include <terra/secutil/secure_array.h>
 #include <terra/secutil/secure_vector.h>
 
