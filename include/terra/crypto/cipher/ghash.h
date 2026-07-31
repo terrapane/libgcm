@@ -32,6 +32,12 @@
  *      input.  The GCM object will verify the IV length is not exceeded, while
  *      the GHASH object will verify the AAD and text lengths are not exceeded.
  *
+ *      NOTE: It is important that TERRA_DISABLE_GHASH_TABLES is defined
+ *            by the user of the library with the same value as was used
+ *            when building the library, else the class definition will not
+ *            match since the member M and one function is included
+ *            conditionally.
+ *
  *  Portability Issues:
  *      None.
  */
