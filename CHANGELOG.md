@@ -1,5 +1,10 @@
 # Change Log
 
+v1.1.7
+
+- Introduced table-based GHASH computation for better speed when processing
+  larger messages
+
 v1.1.6
 
 - Updated dependencies
