@@ -90,8 +90,7 @@ class GHASH
     protected:
         void ConsumeInput(std::span<const std::uint8_t> text);
         void ProcessResidualInput();
-        void MultiplyGF(std::span<std::uint32_t, 4> X,
-                        std::span<const std::uint32_t, 4> Y);
+        void MultiplyGF(std::span<std::uint32_t, 4> X);
 #ifndef TERRA_DISABLE_GHASH_TABLES
         void MultiplyGFUsingTables(std::span<std::uint32_t, 4> X);
 #endif

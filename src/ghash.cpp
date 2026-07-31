@@ -724,10 +724,10 @@ void GHASH::ConsumeInput(std::span<const std::uint8_t> text)
         }
         else
         {
-            MultiplyGF(Yi, H);
+            MultiplyGF(Yi);
         }
 #else
-        MultiplyGF(Yi, H);
+        MultiplyGF(Yi);
 #endif // TERRA_DISABLE_GHASH_TABLES
 
         // Clear the remaining input buffer
@@ -755,10 +755,10 @@ void GHASH::ConsumeInput(std::span<const std::uint8_t> text)
         }
         else
         {
-            MultiplyGF(Yi, H);
+            MultiplyGF(Yi);
         }
 #else
-        MultiplyGF(Yi, H);
+        MultiplyGF(Yi);
 #endif // TERRA_DISABLE_GHASH_TABLES
     }
 
@@ -810,10 +810,10 @@ void GHASH::ProcessResidualInput()
         }
         else
         {
-            MultiplyGF(Yi, H);
+            MultiplyGF(Yi);
         }
 #else
-        MultiplyGF(Yi, H);
+        MultiplyGF(Yi);
 #endif // TERRA_DISABLE_GHASH_TABLES
 
         // Clear the remaining_input
@@ -826,14 +826,11 @@ void GHASH::ProcessResidualInput()
  *
  *  Description:
  *      Perform a multiplication operation per the GCM specification in
- *      Galois Field GF(2^128).  That is, implements X = X * Y.
+ *      Galois Field GF(2^128).  That is, implements X = X * H.
  *
  *  Parameters:
  *      X [in/out]
- *          First input value used in a multiplication operation.
- *
- *      Y [in]
- *          Second input value used in a multiplication operation.
+ *          Input value used in a multiplication operation.
  *
  *  Returns:
  *      Nothing, though the output will be stored in X.
@@ -844,8 +841,7 @@ void GHASH::ProcessResidualInput()
  *      slower and this unrolled version is substantially faster, even when
  *      compiling optimized code.
  */
-void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X,
-                       std::span<const std::uint32_t, 4> Y)
+void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X)
 {
     // Copy the value of X into T
     std::ranges::copy(X, T.begin());
@@ -854,137 +850,137 @@ void GHASH::MultiplyGF(std::span<std::uint32_t, 4> X,
     std::ranges::fill(X, static_cast<std::uint32_t>(0));
 
     // Operator over each term
-    MultiplySingleTerm(0, 0x8000'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x4000'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x2000'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x1000'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0800'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0400'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0200'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0100'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0080'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0040'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0020'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0010'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0008'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0004'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0002'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0001'0000, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'8000, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'4000, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'2000, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'1000, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0800, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0400, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0200, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0100, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0080, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0040, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0020, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0010, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0008, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0004, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0002, T, X, Y);
-    MultiplySingleTerm(0, 0x0000'0001, T, X, Y);
+    MultiplySingleTerm(0, 0x8000'0000, T, X, H);
+    MultiplySingleTerm(0, 0x4000'0000, T, X, H);
+    MultiplySingleTerm(0, 0x2000'0000, T, X, H);
+    MultiplySingleTerm(0, 0x1000'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0800'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0400'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0200'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0100'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0080'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0040'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0020'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0010'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0008'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0004'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0002'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0001'0000, T, X, H);
+    MultiplySingleTerm(0, 0x0000'8000, T, X, H);
+    MultiplySingleTerm(0, 0x0000'4000, T, X, H);
+    MultiplySingleTerm(0, 0x0000'2000, T, X, H);
+    MultiplySingleTerm(0, 0x0000'1000, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0800, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0400, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0200, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0100, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0080, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0040, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0020, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0010, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0008, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0004, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0002, T, X, H);
+    MultiplySingleTerm(0, 0x0000'0001, T, X, H);
 
-    MultiplySingleTerm(1, 0x8000'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x4000'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x2000'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x1000'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0800'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0400'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0200'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0100'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0080'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0040'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0020'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0010'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0008'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0004'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0002'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0001'0000, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'8000, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'4000, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'2000, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'1000, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0800, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0400, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0200, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0100, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0080, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0040, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0020, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0010, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0008, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0004, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0002, T, X, Y);
-    MultiplySingleTerm(1, 0x0000'0001, T, X, Y);
+    MultiplySingleTerm(1, 0x8000'0000, T, X, H);
+    MultiplySingleTerm(1, 0x4000'0000, T, X, H);
+    MultiplySingleTerm(1, 0x2000'0000, T, X, H);
+    MultiplySingleTerm(1, 0x1000'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0800'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0400'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0200'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0100'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0080'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0040'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0020'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0010'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0008'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0004'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0002'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0001'0000, T, X, H);
+    MultiplySingleTerm(1, 0x0000'8000, T, X, H);
+    MultiplySingleTerm(1, 0x0000'4000, T, X, H);
+    MultiplySingleTerm(1, 0x0000'2000, T, X, H);
+    MultiplySingleTerm(1, 0x0000'1000, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0800, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0400, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0200, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0100, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0080, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0040, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0020, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0010, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0008, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0004, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0002, T, X, H);
+    MultiplySingleTerm(1, 0x0000'0001, T, X, H);
 
-    MultiplySingleTerm(2, 0x8000'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x4000'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x2000'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x1000'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0800'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0400'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0200'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0100'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0080'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0040'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0020'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0010'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0008'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0004'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0002'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0001'0000, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'8000, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'4000, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'2000, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'1000, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0800, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0400, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0200, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0100, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0080, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0040, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0020, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0010, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0008, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0004, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0002, T, X, Y);
-    MultiplySingleTerm(2, 0x0000'0001, T, X, Y);
+    MultiplySingleTerm(2, 0x8000'0000, T, X, H);
+    MultiplySingleTerm(2, 0x4000'0000, T, X, H);
+    MultiplySingleTerm(2, 0x2000'0000, T, X, H);
+    MultiplySingleTerm(2, 0x1000'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0800'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0400'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0200'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0100'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0080'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0040'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0020'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0010'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0008'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0004'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0002'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0001'0000, T, X, H);
+    MultiplySingleTerm(2, 0x0000'8000, T, X, H);
+    MultiplySingleTerm(2, 0x0000'4000, T, X, H);
+    MultiplySingleTerm(2, 0x0000'2000, T, X, H);
+    MultiplySingleTerm(2, 0x0000'1000, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0800, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0400, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0200, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0100, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0080, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0040, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0020, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0010, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0008, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0004, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0002, T, X, H);
+    MultiplySingleTerm(2, 0x0000'0001, T, X, H);
 
-    MultiplySingleTerm(3, 0x8000'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x4000'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x2000'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x1000'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0800'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0400'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0200'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0100'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0080'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0040'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0020'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0010'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0008'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0004'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0002'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0001'0000, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'8000, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'4000, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'2000, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'1000, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0800, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0400, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0200, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0100, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0080, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0040, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0020, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0010, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0008, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0004, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0002, T, X, Y);
-    MultiplySingleTerm(3, 0x0000'0001, T, X, Y);
+    MultiplySingleTerm(3, 0x8000'0000, T, X, H);
+    MultiplySingleTerm(3, 0x4000'0000, T, X, H);
+    MultiplySingleTerm(3, 0x2000'0000, T, X, H);
+    MultiplySingleTerm(3, 0x1000'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0800'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0400'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0200'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0100'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0080'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0040'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0020'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0010'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0008'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0004'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0002'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0001'0000, T, X, H);
+    MultiplySingleTerm(3, 0x0000'8000, T, X, H);
+    MultiplySingleTerm(3, 0x0000'4000, T, X, H);
+    MultiplySingleTerm(3, 0x0000'2000, T, X, H);
+    MultiplySingleTerm(3, 0x0000'1000, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0800, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0400, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0200, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0100, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0080, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0040, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0020, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0010, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0008, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0004, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0002, T, X, H);
+    MultiplySingleTerm(3, 0x0000'0001, T, X, H);
 }
 
 #ifndef TERRA_DISABLE_GHASH_TABLES
