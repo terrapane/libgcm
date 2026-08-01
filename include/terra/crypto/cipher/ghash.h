@@ -107,7 +107,9 @@ class GHASH
 
 #ifndef TERRA_DISABLE_GHASH_TABLES
         // The size of the following table is 64K and improves performance
-        std::array<std::array<SecUtil::SecureArray<std::uint32_t, 4>, 256>, 16>
+        SecUtil::SecureArray<
+            SecUtil::SecureArray<SecUtil::SecureArray<std::uint32_t, 4>, 256>,
+            16>
             M;
 #endif
 };

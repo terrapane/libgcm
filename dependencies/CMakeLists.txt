@@ -31,7 +31,7 @@ FetchContent_Declare(libaes
 # Fetch and make available security-related utility functions
 FetchContent_Declare(secutil
     GIT_REPOSITORY ${TERRAPANE_SOURCE_URI}/secutil.git
-    GIT_TAG        v1.1.1
+    GIT_TAG        v1.1.2
     GIT_SHALLOW    true)
 
 # If not installing libgcm, turn off installation for dependencies

@@ -256,8 +256,9 @@ constexpr void MultiplyByX(std::span<std::uint32_t, 4> V)
  *  Comments:
  *      None.
  */
-void BuildTableM0(std::span<const std::uint32_t, 4> H,
-                  std::array<SecUtil::SecureArray<std::uint32_t, 4>, 256> &M)
+void BuildTableM0(
+    std::span<const std::uint32_t, 4> H,
+    SecUtil::SecureArray<SecUtil::SecureArray<std::uint32_t, 4>, 256> &M)
 {
     // M[128] <- H
     std::ranges::copy(H, M[128].begin());
@@ -308,7 +309,9 @@ void BuildTableM0(std::span<const std::uint32_t, 4> H,
  */
 void BuildAllTables(
     std::span<const std::uint32_t, 4> H,
-    std::array<std::array<SecUtil::SecureArray<std::uint32_t, 4>, 256>, 16> &M)
+    SecUtil::SecureArray<
+        SecUtil::SecureArray<SecUtil::SecureArray<std::uint32_t, 4>, 256>,
+        16> &M)
 {
     // Build M[0] using the algorithm from Section 4.2 (gcm_revised)
     BuildTableM0(H, M[0]);
