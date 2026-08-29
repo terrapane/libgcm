@@ -5,6 +5,7 @@ v1.1.7
 - Introduced table-based GHASH computation for better speed when processing
   larger messages
 - Updated dependencies
+- Added clang-tidy support for unit tests
 
 v1.1.6
 

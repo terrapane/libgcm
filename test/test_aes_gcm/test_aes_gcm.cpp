@@ -15,11 +15,17 @@
  *      None.
  */
 
-#include <ostream>
+#include <cstddef>
+#include <cstdint>
 #include <array>
+#include <algorithm>
+#include <utility>
 #include <terra/crypto/cipher/gcm.h>
-#include <terra/stf/adapters/integral_array.h>
+#include <terra/stf/adapters/integral_array.h> // NOLINT(misc-include-cleaner)
 #include <terra/stf/stf.h>
+
+namespace
+{
 
 using namespace Terra::Crypto::Cipher::GCM;
 
@@ -126,9 +132,9 @@ STF_TEST(AES_GCM, TestCase2)
         0xab, 0x6e, 0x47, 0xd4, 0x2c, 0xec, 0x13, 0xbd,
         0xf5, 0x3a, 0x67, 0xb2, 0x12, 0x57, 0xbd, 0xdf
     };
-    std::array<std::uint8_t, 16> ciphertext;
-    std::array<std::uint8_t, 16> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> ciphertext{};
+    std::array<std::uint8_t, 16> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -200,9 +206,9 @@ STF_TEST(AES_GCM, TestCase2_NoTables)
         0xab, 0x6e, 0x47, 0xd4, 0x2c, 0xec, 0x13, 0xbd,
         0xf5, 0x3a, 0x67, 0xb2, 0x12, 0x57, 0xbd, 0xdf
     };
-    std::array<std::uint8_t, 16> ciphertext;
-    std::array<std::uint8_t, 16> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> ciphertext{};
+    std::array<std::uint8_t, 16> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -286,9 +292,9 @@ STF_TEST(AES_GCM, TestCase3)
         0x4d, 0x5c, 0x2a, 0xf3, 0x27, 0xcd, 0x64, 0xa6,
         0x2c, 0xf3, 0x5a, 0xbd, 0x2b, 0xa6, 0xfa, 0xb4
     };
-    std::array<std::uint8_t, 64> ciphertext;
-    std::array<std::uint8_t, 64> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 64> ciphertext{};
+    std::array<std::uint8_t, 64> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -378,9 +384,9 @@ STF_TEST(AES_GCM, TestCase4)
         0x5b, 0xc9, 0x4f, 0xbc, 0x32, 0x21, 0xa5, 0xdb,
         0x94, 0xfa, 0xe9, 0x5a, 0xe7, 0x12, 0x1a, 0x47
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -475,9 +481,9 @@ STF_TEST(AES_GCM, TestCase5)
         0x36, 0x12, 0xd2, 0xe7, 0x9e, 0x3b, 0x07, 0x85,
         0x56, 0x1b, 0xe1, 0x4a, 0xac, 0xa2, 0xfc, 0xcb
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -579,9 +585,9 @@ STF_TEST(AES_GCM, TestCase6)
         0x61, 0x9c, 0xc5, 0xae, 0xff, 0xfe, 0x0b, 0xfa,
         0x46, 0x2a, 0xf4, 0x3c, 0x16, 0x99, 0xd0, 0x50
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -650,7 +656,7 @@ STF_TEST(AES_GCM, TestCase7)
         0xcd, 0x33, 0xb2, 0x8a, 0xc7, 0x73, 0xf7, 0x4b,
         0xa0, 0x0e, 0xd1, 0xf3, 0x12, 0x57, 0x24, 0x35
     };
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -715,9 +721,9 @@ STF_TEST(AES_GCM, TestCase8)
         0x2f, 0xf5, 0x8d, 0x80, 0x03, 0x39, 0x27, 0xab,
         0x8e, 0xf4, 0xd4, 0x58, 0x75, 0x14, 0xf0, 0xfb
     };
-    std::array<std::uint8_t, 16> ciphertext;
-    std::array<std::uint8_t, 16> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> ciphertext{};
+    std::array<std::uint8_t, 16> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -803,9 +809,9 @@ STF_TEST(AES_GCM, TestCase9)
         0x99, 0x24, 0xa7, 0xc8, 0x58, 0x73, 0x36, 0xbf,
         0xb1, 0x18, 0x02, 0x4d, 0xb8, 0x67, 0x4a, 0x14
     };
-    std::array<std::uint8_t, 64> ciphertext;
-    std::array<std::uint8_t, 64> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 64> ciphertext{};
+    std::array<std::uint8_t, 64> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -896,9 +902,9 @@ STF_TEST(AES_GCM, TestCase10)
         0x25, 0x19, 0x49, 0x8e, 0x80, 0xf1, 0x47, 0x8f,
         0x37, 0xba, 0x55, 0xbd, 0x6d, 0x27, 0x61, 0x8c
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -994,9 +1000,9 @@ STF_TEST(AES_GCM, TestCase11)
         0x65, 0xdc, 0xc5, 0x7f, 0xcf, 0x62, 0x3a, 0x24,
         0x09, 0x4f, 0xcc, 0xa4, 0x0d, 0x35, 0x33, 0xf8
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1099,9 +1105,9 @@ STF_TEST(AES_GCM, TestCase12)
         0xdc, 0xf5, 0x66, 0xff, 0x29, 0x1c, 0x25, 0xbb,
         0xb8, 0x56, 0x8f, 0xc3, 0xd3, 0x76, 0xa6, 0xd9
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1171,7 +1177,7 @@ STF_TEST(AES_GCM, TestCase13)
         0x53, 0x0f, 0x8a, 0xfb, 0xc7, 0x45, 0x36, 0xb9,
         0xa9, 0x63, 0xb4, 0xf1, 0xc4, 0xcb, 0x73, 0x8b
     };
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1237,9 +1243,9 @@ STF_TEST(AES_GCM, TestCase14)
         0xd0, 0xd1, 0xc8, 0xa7, 0x99, 0x99, 0x6b, 0xf0,
         0x26, 0x5b, 0x98, 0xb5, 0xd4, 0x8a, 0xb9, 0x19
     };
-    std::array<std::uint8_t, 16> ciphertext;
-    std::array<std::uint8_t, 16> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> ciphertext{};
+    std::array<std::uint8_t, 16> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1325,9 +1331,9 @@ STF_TEST(AES_GCM, TestCase15)
         0xb0, 0x94, 0xda, 0xc5, 0xd9, 0x34, 0x71, 0xbd,
         0xec, 0x1a, 0x50, 0x22, 0x70, 0xe3, 0xcc, 0x6c
     };
-    std::array<std::uint8_t, 64> ciphertext;
-    std::array<std::uint8_t, 64> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 64> ciphertext{};
+    std::array<std::uint8_t, 64> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1419,9 +1425,9 @@ STF_TEST(AES_GCM, TestCase16)
         0x76, 0xfc, 0x6e, 0xce, 0x0f, 0x4e, 0x17, 0x68,
         0xcd, 0xdf, 0x88, 0x53, 0xbb, 0x2d, 0x55, 0x1b
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1518,9 +1524,9 @@ STF_TEST(AES_GCM, TestCase17)
         0x3a, 0x33, 0x7d, 0xbf, 0x46, 0xa7, 0x92, 0xc4,
         0x5e, 0x45, 0x49, 0x13, 0xfe, 0x2e, 0xa8, 0xf2
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1624,9 +1630,9 @@ STF_TEST(AES_GCM, TestCase18)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1730,9 +1736,9 @@ STF_TEST(AES_GCM, TestCase18_incremental)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 60> plaintext_recovered;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 60> plaintext_recovered{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Encryption
 
@@ -1750,6 +1756,7 @@ STF_TEST(AES_GCM, TestCase18_incremental)
     {
         auto length =
             std::min(static_cast<std::size_t>(16), plaintext.size() - i);
+        // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-constant-array-index)
         gcm.Encrypt({&plaintext[i], length}, {&ciphertext[i], length});
     }
     STF_ASSERT_EQ(expected_ciphertext, ciphertext);
@@ -1774,8 +1781,10 @@ STF_TEST(AES_GCM, TestCase18_incremental)
     {
         auto length =
             std::min(static_cast<std::size_t>(16), ciphertext.size() - i);
+        // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
         gcm_d.Decrypt({&ciphertext[i], length},
                       {&plaintext_recovered[i], length});
+        // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
     }
     //gcm_d.Decrypt(ciphertext, plaintext_recovered);
     STF_ASSERT_EQ(plaintext, plaintext_recovered);
@@ -1848,8 +1857,8 @@ STF_TEST(AES_GCM, TestGCMCopy1)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Initialize GCM
     GCM_ gcm(iv, key);
@@ -1936,8 +1945,8 @@ STF_TEST(AES_GCM, TestGCMCopy2)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Initialize GCM
     GCM_ gcm(iv, key);
@@ -2025,8 +2034,8 @@ STF_TEST(AES_GCM, TestGCMMove)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Initialize GCM
     GCM_ gcm(iv, key);
@@ -2113,8 +2122,8 @@ STF_TEST(AES_GCM, TestGCMMoveAssignment)
         0xa4, 0x4a, 0x82, 0x66, 0xee, 0x1c, 0x8e, 0xb0,
         0xc8, 0xb5, 0xd4, 0xcf, 0x5a, 0xe9, 0xf1, 0x9a
     };
-    std::array<std::uint8_t, 60> ciphertext;
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 60> ciphertext{};
+    std::array<std::uint8_t, 16> tag{};
 
     // Initialize GCM
     GCM_ gcm(iv, key);
@@ -2140,8 +2149,6 @@ STF_TEST(AES_GCM, TestGCMMoveAssignment)
     STF_ASSERT_EQ(expected_tag, tag);
 }
 
-#ifdef TERRA_ENABLE_GCM_SPEED_TESTS
-
 // This function tests the performance of the encryption code
 STF_TEST(AES_GCM, EncryptionSpeedTest128)
 {
@@ -2165,7 +2172,7 @@ STF_TEST(AES_GCM, EncryptionSpeedTest128)
         0x5e, 0xfd, 0xd9, 0xf6, 0x0e, 0xbc, 0x01, 0xb2,
         0xa7, 0x18, 0x1f, 0x36, 0xef, 0x18, 0xa1, 0x7b
     };
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> tag{};
 
     GCM gcm(iv, key);
 
@@ -2204,7 +2211,7 @@ STF_TEST(AES_GCM, DecryptionSpeedTest128)
         0x5e, 0xfd, 0xd9, 0xf6, 0x0e, 0xbc, 0x01, 0xb2,
         0xa7, 0x18, 0x1f, 0x36, 0xef, 0x18, 0xa1, 0x7b
     };
-    std::array<std::uint8_t, 16> tag;
+    std::array<std::uint8_t, 16> tag{};
 
     GCM gcm(iv, key);
 
@@ -2220,4 +2227,9 @@ STF_TEST(AES_GCM, DecryptionSpeedTest128)
     STF_ASSERT_EQ(expected_tag, tag);
 }
 
-#endif // TERRA_ENABLE_GCM_SPEED_TESTS
+#ifndef TERRA_ENABLE_GCM_SPEED_TESTS
+STF_TEST_EXCLUDE(AES_GCM, EncryptionSpeedTest128);
+STF_TEST_EXCLUDE(AES_GCM, DecryptionSpeedTest128);
+#endif
+
+} // namespace
