@@ -32,6 +32,12 @@
  *      input.  The GCM object will verify the IV length is not exceeded, while
  *      the GHASH object will verify the AAD and text lengths are not exceeded.
  *
+ *      The "use_tables" parameter in the constructor instructs the GHASH
+ *      object to build and use tables that significantly improves performance
+ *      when operating on larger input.  If the input is only 100 or 200 octets,
+ *      table generation may result in poorer performance.  For larger input
+ *      sizes, generating tables almost always results in better performance.
+ *
  *      NOTE: It is important that TERRA_DISABLE_GHASH_TABLES is defined
  *            by the user of the library with the same value as was used
  *            when building the library, else the class definition will not
