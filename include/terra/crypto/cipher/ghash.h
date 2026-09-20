@@ -99,7 +99,7 @@ class GHASH
         void MultiplyGF(std::span<std::uint32_t, 4> X);
 #ifndef TERRA_DISABLE_GHASH_TABLES
         void MultiplyGFUsingTables(std::span<std::uint32_t, 4> X);
-#endif
+#endif // TERRA_DISABLE_GHASH_TABLES
 
         bool use_tables;
         bool aad_complete;
@@ -112,12 +112,14 @@ class GHASH
         SecUtil::SecureArray<std::uint32_t, 4> Yi;
 
 #ifndef TERRA_DISABLE_GHASH_TABLES
-        // The size of the following table is 64K and improves performance
+        // The size of the following four tables is 64K and improves performance
+        // when operating are larger input; gcm-revised-spec referrs to these
+        // tables as M0..M3
         SecUtil::SecureArray<
             SecUtil::SecureArray<SecUtil::SecureArray<std::uint32_t, 4>, 256>,
             16>
             M;
-#endif
+#endif // TERRA_DISABLE_GHASH_TABLES
 };
 
 } // namespace Terra::Crypto::Cipher::GCM
