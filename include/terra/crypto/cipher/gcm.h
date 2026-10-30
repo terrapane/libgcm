@@ -94,6 +94,11 @@ class GCM
         // The maximum length of the IV (2^64 - 1 bits) in octets
         static constexpr std::uint64_t Max_IV_Length = 0x1fff'ffff'ffff'ffffULL;
 
+        // Maximum length of the plaintext or ciphertext (2^39 - 256 bits)
+        // expressed in terms of octets
+        static constexpr std::size_t Max_Input_Octets =
+                                                    0x0000'000f'ffff'ffe0ULL;
+
         // Maximum number of 128-bit blocks that may be encrypted / decrypted
         static constexpr std::size_t Max_Input_Blocks = 0xffff'fffeULL;
 

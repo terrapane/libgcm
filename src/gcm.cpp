@@ -91,7 +91,7 @@ GCM::GCM(bool use_tables, BlockCipher cipher) :
  *  Parameters:
  *      iv [in]
  *          The initialization vector to use with this object.  The maximum
- *          length of this vector cannot exceed 2^64 - 1 octets.
+ *          length of this vector cannot exceed 2^64 - 1 bits.
  *
  *      key [in]
  *          The encryption key to use with this this object.  This must be
@@ -284,7 +284,7 @@ GCM &GCM::operator=(const GCM &other)
  *  Parameters:
  *      iv [in]
  *          The initialization vector to use with this object.  The maximum
- *          length of this vector cannot exceed 2^64 - 1 octets.
+ *          length of this vector cannot exceed 2^64 - 1 bits.
  *
  *      key [in]
  *          The encryption key to use with this this object.  This must be
