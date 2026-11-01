@@ -1,5 +1,9 @@
 # Change Log
 
+v.1.1.8 (in progress)
+
+- Revised speed test configuration option
+
 v1.1.7
 
 - Introduced table-based GHASH computation for better speed when processing
