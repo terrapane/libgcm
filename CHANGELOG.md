@@ -3,6 +3,7 @@
 v.1.1.8 (in progress)
 
 - Revised speed test configuration option
+- Minor editorial changes
 
 v1.1.7
 
