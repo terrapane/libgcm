@@ -248,10 +248,14 @@ constexpr void MultiplyByX(std::span<std::uint32_t, 4> V)
  *      section 4.1 of gcm-revised-spec.pdf dated May 31, 2005.
  *
  *  Parameters:
- *      None.
+ *      H [in]
+ *          The value of H as per Section 6.4 of NIST SP 800-38D.
+ *
+ *      M [in]
+ *          Array of the 16 tables M0..M15.
  *
  *  Returns:
- *      Nothing.
+ *      Nothing, but the table M0 will be populated.
  *
  *  Comments:
  *      None.
@@ -260,10 +264,10 @@ void BuildTableM0(
     std::span<const std::uint32_t, 4> H,
     SecUtil::SecureArray<SecUtil::SecureArray<std::uint32_t, 4>, 256> &M)
 {
-    // M[128] <- H
+    // Assign H to M[128]
     std::ranges::copy(H, M[128].begin());
 
-    // i <- 64; while i > 0 do M[i] <- M[2i] * x; i <- i / 2
+    // Populate the lower quarter of M0
     for (std::size_t i = 64; i > 0; i /= 2)
     {
         // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
@@ -272,7 +276,7 @@ void BuildTableM0(
         // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
     }
 
-    // i <- 2; while i <= 128 ...
+    // Populate the full table
     for (std::size_t i = 2; i <= 128; i *= 2)
     {
         for (std::size_t j = 1; j < i; j++)
@@ -287,7 +291,7 @@ void BuildTableM0(
         }
     }
 
-    // M[0] <- 0^128
+    // Assign 0 to M[0]
     M[0] = {0, 0, 0, 0};
 }
 
@@ -299,10 +303,14 @@ void BuildTableM0(
  *      section 4.1 of gcm-revised-spec.pdf dated May 31, 2005.
  *
  *  Parameters:
- *      None.
+ *      H [in]
+ *          The value of H as per Section 6.4 of NIST SP 800-38D.
+ *
+ *      M [in]
+ *          Array of the 16 tables M0..M15.
  *
  *  Returns:
- *      Nothing.
+ *      Nothing, but the tables M0..M15 will be populated.
  *
  *  Comments:
  *      None.
